@@ -10,6 +10,8 @@ import std.variant;
 
 interface Adapter
 {
+    EscapedString bind(EscapedString sql, Nullable!Variant[] parameters...);
+
     bool close();
 
     bool commit();
