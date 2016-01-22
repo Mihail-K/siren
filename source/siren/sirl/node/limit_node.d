@@ -1,6 +1,8 @@
 
 module siren.sirl.node.limit_node;
 
+import siren.sirl.node.base;
+
 import std.conv;
 import std.string;
 
@@ -15,22 +17,22 @@ public:
         _limit = limit;
     }
 
-    static LimitNode create(T : LimitNode)(T limit)
+    static LimitNode create(LimitNode limit)
     {
         return limit;
     }
 
-    static LimitNode create(T : ulong)(T limit)
+    static LimitNode create(ulong limit)
     {
         return new LimitNode(limit);
     }
 
-    static LimitNode create(T : string)(T limit)
+    static LimitNode create(string limit)
     {
         return new LimitNode(limit.to!ulong);
     }
 
-    static LimitNode create(T : typeof(null))(T limit)
+    static LimitNode create(typeof(null) limit)
     {
         return null;
     }

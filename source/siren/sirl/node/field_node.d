@@ -1,6 +1,8 @@
 
 module siren.sirl.node.field_node;
 
+import siren.sirl.node.base;
+
 import std.string;
 
 class FieldNode : Node
@@ -16,10 +18,25 @@ public:
         _field = field;
     }
 
+    static FieldNode create(string table, FieldNode field)
+    {
+        return field;
+    }
+
+    static FieldNode create(string table, string field)
+    {
+        return new FieldNode(table, field);
+    }
+
+    static FieldNode create(string table, typeof(null) field)
+    {
+        return new FieldNode(table, field);
+    }
+
     @property
     string field()
     {
-        return _field;
+        return _field ? _field : "*";
     }
 
     @property
@@ -30,6 +47,6 @@ public:
 
     override string toString()
     {
-        return "Field(%s.%s)".format(_table, _field);
+        return "Field(%s.%s)".format(_table, field);
     }
 }

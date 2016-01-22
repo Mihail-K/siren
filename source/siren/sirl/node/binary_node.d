@@ -1,6 +1,8 @@
 
 module siren.sirl.node.binary_node;
 
+import siren.sirl.node.base;
+
 abstract class BinaryNode : Node
 {
 private:

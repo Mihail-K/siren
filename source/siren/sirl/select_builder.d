@@ -1,6 +1,8 @@
 
 module siren.sirl.select_builder;
 
+import siren.sirl.node;
+
 class SelectBuilder
 {
 private:
@@ -24,6 +26,27 @@ public:
     SelectBuilder offset(T)(T offset)
     {
         _select.offset = OffsetNode.create(offset);
+
+        return this;
+    }
+
+    SelectBuilder projection(TList...)(TList projection)
+    if(TList.length == 0)
+    {
+        return projection(null);
+    }
+
+    SelectBuilder projection(TList...)(TList projection)
+    if(TList.length > 0)
+    {
+        auto fields = new FieldNode[TList.length];
+
+        foreach(index, field; projection)
+        {
+            fields[index] = FieldNode.create(_table, field);
+        }
+
+        _select.projection = fields;
 
         return this;
     }

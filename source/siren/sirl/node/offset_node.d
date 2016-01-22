@@ -1,6 +1,9 @@
 
 module siren.sirl.node.offset_node;
 
+import siren.sirl.node.base;
+
+import std.conv;
 import std.string;
 
 class OffsetNode : Node
@@ -14,22 +17,22 @@ public:
         _offset = offset;
     }
 
-    static OffsetNode create(T : OffsetNode)(T offset)
+    static OffsetNode create(OffsetNode offset)
     {
         return offset;
     }
 
-    static OffsetNode create(T : ulong)(T offset)
+    static OffsetNode create(ulong offset)
     {
         return new OffsetNode(offset);
     }
 
-    static OffsetNode create(T : string)(T offset)
+    static OffsetNode create(string offset)
     {
         return new OffsetNode(offset.to!ulong);
     }
 
-    static OffsetNode create(T : typeof(null))(T offset)
+    static OffsetNode create(typeof(null) offset)
     {
         return null;
     }

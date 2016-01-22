@@ -1,6 +1,9 @@
 
 module siren.sirl.node.arithmetic_node;
 
+import siren.sirl.node.base;
+import siren.sirl.node.binary_node;
+
 enum ArithmeticOperator
 {
     Plus,
@@ -21,13 +24,14 @@ private:
     ArithmeticOperator _operator;
 
 public:
-    this(ArithmeticOperator operator)
+    this(Node left, ArithmeticOperator operator, Node right)
     {
+        super(left, right);
         _operator = operator;
     }
 
     @property
-    string operator()
+    ArithmeticOperator operator()
     {
         return _operator;
     }
