@@ -40,7 +40,7 @@ template isAccessibleFunction(E : Entity, string name)
 {
     static if(isAccessible!(E, name))
     {
-        enum isAccessibleFunction = typeof(__traits(getMember, E, name) == function);
+        enum isAccessibleFunction = is(typeof(__traits(getMember, E, name)) == function);
     }
     else
     {
