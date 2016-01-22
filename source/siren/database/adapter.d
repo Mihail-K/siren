@@ -8,64 +8,140 @@ import siren.util.escaped_string;
 import std.typecons;
 import std.variant;
 
-interface Adapter
+abstract class Adapter
 {
-    EscapedString bind(EscapedString sql, Nullable!Variant[] parameters...);
+    /++
+     + Binds parameters to an SQL-string template.
+     ++/
+    abstract EscapedString bind(EscapedString sql, Nullable!Variant[] parameters...);
 
-    bool close();
+    /++
+     + Closes the connection permanently and performs necessary clean up.
+     ++/
+    abstract void close();
 
-    bool commit();
+    /++
+     + Commits and exits the current database transaction.
+     ++/
+    abstract void commit();
 
-    bool connect();
+    /++
+     + Connects to the database, unless already connected.
+     ++/
+    abstract void connect();
 
     @property
-    bool connected();
+    abstract void connected();
 
+    /++
+     + The raw database connection object used by the adapter.
+     ++/
     @property
-    Object connection(); // TODO : Connection type.
+    abstract Object connection(); // TODO : Connection type.
 
+    /++
+     + An alias for destroy.
+     ++/
     alias delete_ = destroy;
 
-    ulong destroy(EscapedString sql, string context = null);
+    abstract ulong destroy(EscapedString sql, string context);
 
-    ulong destroy(EscapedString sql, Nullable!Variant[] parameters...);
+    ulong destroy(EscapedString sql, Nullable!Variant[] parameters = []...)
+    {
+        return destroy(bind(sql, parameters), cast(string) null);
+    }
 
-    ulong destroy(EscapedString sql, string context, Nullable!Variant[] parameters...);
+    ulong destroy(EscapedString sql, string context, Nullable!Variant[] parameters = []...)
+    {
+        return destroy(bind(sql, parameters), context);
+    }
 
-    bool disconnect();
+    /++
+     + Closes the current database connection.
+     ++/
+    abstract void disconnect();
 
-    EscapedString escape(string raw);
+    /++
+     + Escapes a raw SQL string.
+     ++/
+    abstract EscapedString escape(string raw);
 
-    ulong exec(EscapedString sql, string context = null);
+    abstract ulong exec(EscapedString sql, string context);
 
-    ulong exec(EscapedString sql, Nullable!Variant[] parameters...);
+    ulong exec(EscapedString sql, Nullable!Variant[] parameters = []...)
+    {
+        return exec(bind(sql, parameters), cast(string) null);
+    }
 
-    ulong exec(EscapedString sql, string context, Nullable!Variant[] parameters...);
+    ulong exec(EscapedString sql, string context, Nullable!Variant[] parameters = []...)
+    {
+        return exec(bind(sql, parameters), context);
+    }
 
-    InsertResult insert(EscapedString sql, string context = null);
+    /++
+     + Adds a hook function to be executed once the current transaction ends.
+     ++/
+    void hook(scope void function(bool success) callback);
 
-    InsertResult insert(EscapedString sql, Nullable!Variant[] parameters...);
+    /++
+     + Adds a hook delegate to be executed once the current transaction ends.
+     ++/
+    void hook(scope void delegate(bool success) callback);
 
-    InsertResult insert(EscapedString sql, string context, Nullable!Variant[] parameters...);
+    abstract InsertResult insert(EscapedString sql, string context);
 
+    InsertResult insert(EscapedString sql, Nullable!Variant[] parameters = []...)
+    {
+        return insert(bind(sql, parameters), cast(string) null);
+    }
+
+    InsertResult insert(EscapedString sql, string context, Nullable!Variant[] parameters = []...)
+    {
+        return insert(bind(sql, parameters), context);
+    }
+
+    /++
+     + A human-readable name for the database adapter.
+     ++/
     @property
-    string name();
+    abstract string name();
 
-    QueryResult query(EscapedString sql, string context = null);
+    abstract QueryResult query(EscapedString sql, string context);
 
-    QueryResult query(EscapedString sql, Nullable!Variant[] parameters...);
+    QueryResult query(EscapedString sql, Nullable!Variant[] parameters = []...)
+    {
+        return query(bind(sql, parameters), cast(string) null);
+    }
 
-    QueryResult query(EscapedString sql, string context, Nullable!Variant[] parameters...);
+    QueryResult query(EscapedString sql, string context, Nullable!Variant[] parameters = []...)
+    {
+        return query(bind(sql, parameters), context);
+    }
 
-    bool reconnect();
+    /++
+     + Closes the active connection, if open, and reconnects to the database.
+     ++/
+    abstract void reconnect();
 
-    bool rollback();
+    /++
+     + Rolls back and exits the current database transaction.
+     ++/
+    abstract void rollback();
 
-    bool transaction();
+    /++
+     + Starts a new database transaction.
+     ++/
+    abstract void transaction();
 
-    ulong update(EscapedString sql, string context = null);
+    abstract ulong update(EscapedString sql, string context);
 
-    ulong update(EscapedString sql, Nullable!Variant[] parameters...);
+    ulong update(EscapedString sql, Nullable!Variant[] parameters = []...)
+    {
+        return update(bind(sql, parameters), cast(string) null);
+    }
 
-    ulong update(EscapedString sql, string context, Nullable!Variant[] parameters...);
+    ulong update(EscapedString sql, string context, Nullable!Variant[] parameters = []...)
+    {
+        return update(bind(sql, parameters), context);
+    }
 }
