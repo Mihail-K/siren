@@ -1,6 +1,8 @@
 
 module siren.sirl.node.field_node;
 
+import std.string;
+
 class FieldNode : Node
 {
 private:
@@ -28,6 +30,6 @@ public:
 
     override string toString()
     {
-        return "Field(" ~ _table ~ "." ~ _field ~ ")";
+        return "Field(%s.%s)".format(_table, _field);
     }
 }

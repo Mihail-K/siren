@@ -2,6 +2,7 @@
 module siren.sirl.table;
 
 import siren.sirl.node;
+import siren.sirl.select_builder;
 
 class Table
 {
@@ -35,12 +36,10 @@ public:
         return new InsertBuilder;
     }
 
-    alias SelectBuilder = Object; // TODO
-
     @property
     SelectBuilder select()
     {
-        return new SelectBuilder;
+        return new SelectBuilder(_table);
     }
 
     alias UpdateBuilder = Object; // TODO
