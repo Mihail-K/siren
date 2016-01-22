@@ -106,16 +106,16 @@ abstract class Adapter
     @property
     abstract string name();
 
-    abstract QueryResult query(EscapedString sql, string context);
+    abstract QueryResult select(EscapedString sql, string context);
 
-    QueryResult query(EscapedString sql, Nullable!Variant[] parameters = []...)
+    QueryResult select(EscapedString sql, Nullable!Variant[] parameters = []...)
     {
-        return query(bind(sql, parameters), cast(string) null);
+        return select(bind(sql, parameters), cast(string) null);
     }
 
-    QueryResult query(EscapedString sql, string context, Nullable!Variant[] parameters = []...)
+    QueryResult select(EscapedString sql, string context, Nullable!Variant[] parameters = []...)
     {
-        return query(bind(sql, parameters), context);
+        return select(bind(sql, parameters), context);
     }
 
     /++
