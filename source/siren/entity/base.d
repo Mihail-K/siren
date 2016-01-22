@@ -3,6 +3,7 @@ module siren.entity.base;
 
 import siren.entity.attributes;
 import siren.entity.column;
+import siren.util.types;
 
 import std.array;
 import std.exception;
