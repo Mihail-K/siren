@@ -4,6 +4,8 @@ module siren.sirl.node.arithmetic_node;
 import siren.sirl.node.base;
 import siren.sirl.node.binary_node;
 
+import std.string;
+
 enum ArithmeticOperator
 {
     Plus,
@@ -34,5 +36,10 @@ public:
     ArithmeticOperator operator()
     {
         return _operator;
+    }
+
+    override string toString()
+    {
+        return "Arithmetic(%s %s %s)".format(left, operator, right);
     }
 }
