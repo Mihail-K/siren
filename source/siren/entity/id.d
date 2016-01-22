@@ -12,11 +12,11 @@ struct ID
 {
 }
 
-template isID(M : Model, string field)
+template isID(E : Entity, string field)
 {
-    static if(isAccessibleField!(M, field))
+    static if(isAccessibleField!(E, field))
     {
-        enum isID = hasUDA!(__traits(getMember, M, field), ID);
+        enum isID = hasUDA!(__traits(getMember, E, field), ID);
     }
     else
     {
@@ -24,44 +24,44 @@ template isID(M : Model, string field)
     }
 }
 
-template hasID(M : Model)
+template hasID(E : Entity)
 {
     template _isID(string field)
     {
-        enum _isID = isID!(M, field);
+        enum _isID = isID!(E, field);
     }
 
-    enum hasID = Filter!(_isID, FieldNameTuple!M).length > 0;
+    enum hasID = Filter!(_isID, FieldNameTuple!E).length > 0;
 }
 
-template getIDColumn(M : Model)
+template getIDColumn(E : Entity)
 {
-    enum getIDColumn = getColumn!(M, getIDColumnField!M);
+    enum getIDColumn = getColumn!(E, getIDColumnField!E);
 }
 
-template getIDColumnName(M : Model)
+template getIDColumnName(E : Entity)
 {
-    enum getIDColumnName = getIDColumn!M.name;
+    enum getIDColumnName = getIDColumn!E.name;
 }
 
-template getIDColumnField(M : Model)
+template getIDColumnField(E : Entity)
 {
-    static assert(hasID!M, "Model `" ~ M.stringof ~ "` doesn't have an ID.");
+    static assert(hasID!E, "Entity `" ~ E.stringof ~ "` doesn't have an ID.");
 
     template _isID(string field)
     {
-        enum _isID = isID!(M, field);
+        enum _isID = isID!(E, field);
     }
 
-    alias idColumns = Filter!(_isID, FieldNameTuple!M);
-    static assert(idColumns.length == 1, "Model `" ~ M.stringof ~ "` defines multiple IDs.");
+    alias idColumns = Filter!(_isID, FieldNameTuple!E);
+    static assert(idColumns.length == 1, "Entity `" ~ E.stringof ~ "` defines multiple IDs.");
 
     enum getIDColumnField = idColumns[0];
 }
 
-template IDType(M : Model)
+template IDType(E : Entity)
 {
-    static assert(hasID!M, "Model `" ~ M.stringof ~ "` doesn't have an ID.");
+    static assert(hasID!E, "Entity `" ~ E.stringof ~ "` doesn't have an ID.");
 
-    alias IDType = typeof(__traits(getMember, M, getIDColumnField!M));
+    alias IDType = typeof(__traits(getMember, E, getIDColumnField!E));
 }
