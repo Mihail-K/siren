@@ -3,6 +3,7 @@ module siren.sirl.node.order_node;
 
 import siren.sirl.node.base;
 import siren.sirl.node.field_node;
+import siren.sirl.node.node_visitor;
 
 import std.exception;
 import std.string;
@@ -47,6 +48,11 @@ public:
     static OrderNode create(FieldNode field, string direction)
     {
         return new OrderNode(field, direction.fromName);
+    }
+
+    override void accept(NodeVisitor visitor)
+    {
+        visitor.visit(this);
     }
 
     @property

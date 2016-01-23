@@ -2,6 +2,7 @@
 module siren.sirl.node.limit_node;
 
 import siren.sirl.node.base;
+import siren.sirl.node.node_visitor;
 
 import std.conv;
 import std.string;
@@ -35,6 +36,11 @@ public:
     static LimitNode create(typeof(null) limit)
     {
         return null;
+    }
+
+    override void accept(NodeVisitor visitor)
+    {
+        visitor.visit(this);
     }
 
     @property

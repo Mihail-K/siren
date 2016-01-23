@@ -3,6 +3,7 @@ module siren.sirl.node.arithmetic_node;
 
 import siren.sirl.node.base;
 import siren.sirl.node.binary_node;
+import siren.sirl.node.node_visitor;
 
 import std.string;
 
@@ -30,6 +31,11 @@ public:
     {
         super(left, right);
         _operator = operator;
+    }
+
+    override void accept(NodeVisitor visitor)
+    {
+        visitor.visit(this);
     }
 
     @property

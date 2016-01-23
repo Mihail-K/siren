@@ -4,6 +4,7 @@ module siren.sirl.node.select_node;
 import siren.sirl.node.base;
 import siren.sirl.node.field_node;
 import siren.sirl.node.limit_node;
+import siren.sirl.node.node_visitor;
 import siren.sirl.node.offset_node;
 import siren.sirl.node.order_node;
 
@@ -16,6 +17,31 @@ private:
     FieldNode[] _projection;
 
 public:
+    override void accept(NodeVisitor visitor)
+    {
+        visitor.visit(this);
+
+        foreach(field; _projection)
+        {
+            visitor.visit(field);
+        }
+
+        foreach(order; _orders)
+        {
+            visitor.visit(order);
+        }
+
+        if(_limit !is null)
+        {
+            visitor.visit(_limit);
+        }
+
+        if(_offset !is null)
+        {
+            visitor.visit(_offset);
+        }
+    }
+
     @property
     LimitNode limit()
     {

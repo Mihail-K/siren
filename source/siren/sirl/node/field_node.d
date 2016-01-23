@@ -2,6 +2,7 @@
 module siren.sirl.node.field_node;
 
 import siren.sirl.node.base;
+import siren.sirl.node.node_visitor;
 
 import std.string;
 
@@ -31,6 +32,11 @@ public:
     static FieldNode create(string table, typeof(null) field)
     {
         return new FieldNode(table, field);
+    }
+
+    override void accept(NodeVisitor visitor)
+    {
+        visitor.visit(this);
     }
 
     @property
