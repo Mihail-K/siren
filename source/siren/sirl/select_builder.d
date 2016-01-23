@@ -1,6 +1,7 @@
 
 module siren.sirl.select_builder;
 
+import siren.sirl.generator;
 import siren.sirl.node;
 
 import std.algorithm;
@@ -106,14 +107,14 @@ public:
     }
 
     @property
-    SelectNode selectNode()
-    {
-        return _select;
-    }
-
-    @property
     string table()
     {
         return _table;
+    }
+
+    string toSql(Generator generator)
+    {
+        generator.visit(_select);
+        return generator.data;
     }
 }
