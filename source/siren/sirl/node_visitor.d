@@ -1,5 +1,5 @@
 
-module siren.sirl.node.node_visitor;
+module siren.sirl.node_visitor;
 
 import siren.sirl.node;
 

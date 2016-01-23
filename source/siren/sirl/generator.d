@@ -1,7 +1,7 @@
 
 module siren.sirl.generator;
 
-import siren.sirl.node;
+import siren.sirl.node_visitor;
 
 abstract class Generator : NodeVisitor
 {

@@ -1,7 +1,7 @@
 
 module siren.sirl.node.base;
 
-import siren.sirl.node.node_visitor;
+import siren.sirl.node_visitor;
 
 abstract class Node
 {

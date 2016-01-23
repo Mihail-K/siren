@@ -3,7 +3,7 @@ module siren.sirl.node.order_node;
 
 import siren.sirl.node.base;
 import siren.sirl.node.field_node;
-import siren.sirl.node.node_visitor;
+import siren.sirl.node_visitor;
 
 import std.exception;
 import std.string;

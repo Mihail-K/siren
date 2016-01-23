@@ -2,7 +2,7 @@
 module siren.sirl.node.limit_node;
 
 import siren.sirl.node.base;
-import siren.sirl.node.node_visitor;
+import siren.sirl.node_visitor;
 
 import std.conv;
 import std.string;
