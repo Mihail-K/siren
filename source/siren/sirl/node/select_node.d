@@ -5,12 +5,14 @@ import siren.sirl.node.base;
 import siren.sirl.node.field_node;
 import siren.sirl.node.limit_node;
 import siren.sirl.node.offset_node;
+import siren.sirl.node.order_node;
 
 class SelectNode : Node
 {
 private:
     LimitNode _limit;
     OffsetNode _offset;
+    OrderNode[] _orders;
     FieldNode[] _projection;
 
 public:
@@ -36,6 +38,18 @@ public:
     void offset(OffsetNode offset)
     {
         _offset = offset;
+    }
+
+    @property
+    OrderNode[] orders()
+    {
+        return _orders;
+    }
+
+    @property
+    void orders(OrderNode[] orders)
+    {
+        _orders = orders;
     }
 
     @property
