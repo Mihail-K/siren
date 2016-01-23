@@ -1,29 +1,29 @@
 
 module siren.sirl.node.binary_node;
 
-import siren.sirl.node.base;
+import siren.sirl.node.expression_node;
 
-abstract class BinaryNode : Node
+abstract class BinaryNode : ExpressionNode
 {
 private:
-    Node _left;
-    Node _right;
+    ExpressionNode _left;
+    ExpressionNode _right;
 
 public:
-    this(Node left, Node right)
+    this(ExpressionNode left, ExpressionNode right)
     {
         _left = left;
         _right = right;
     }
 
     @property
-    Node left()
+    ExpressionNode left()
     {
         return _left;
     }
 
     @property
-    Node right()
+    ExpressionNode right()
     {
         return _right;
     }

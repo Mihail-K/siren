@@ -1,8 +1,8 @@
 
 module siren.sirl.node.arithmetic_node;
 
-import siren.sirl.node.base;
 import siren.sirl.node.binary_node;
+import siren.sirl.node.expression_node;
 import siren.sirl.node_visitor;
 
 import std.string;
@@ -27,7 +27,7 @@ private:
     ArithmeticOperator _operator;
 
 public:
-    this(Node left, ArithmeticOperator operator, Node right)
+    this(ExpressionNode left, ArithmeticOperator operator, ExpressionNode right)
     {
         super(left, right);
         _operator = operator;

@@ -1,15 +1,15 @@
 
 module siren.sirl.node.and_node;
 
-import siren.sirl.node.base;
 import siren.sirl.node.binary_node;
+import siren.sirl.node.expression_node;
 import siren.sirl.node_visitor;
 
 import std.string;
 
 class AndNode : BinaryNode
 {
-    this(Node left, Node right)
+    this(ExpressionNode left, ExpressionNode right)
     {
         super(left, right);
     }
