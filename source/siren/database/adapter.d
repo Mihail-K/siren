@@ -3,7 +3,8 @@ module siren.database.adapter;
 
 import siren.database.insert_result;
 import siren.database.query_result;
-import siren.util.escaped_string;
+import siren.sirl;
+import siren.util;
 
 import std.typecons;
 import std.variant;
