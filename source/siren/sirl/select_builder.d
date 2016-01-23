@@ -3,6 +3,9 @@ module siren.sirl.select_builder;
 
 import siren.sirl.node;
 
+import std.algorithm;
+import std.array;
+
 class SelectBuilder
 {
 private:
@@ -46,10 +49,24 @@ public:
         return this;
     }
 
+    SelectBuilder projection()(FieldNode[] projection)
+    {
+        _select.projection = projection;
+
+        return this;
+    }
+
+    SelectBuilder projection()(string[] projection)
+    {
+        auto fields = projection.map!(p => FieldNode.create(_table, p)).array;
+
+        return this.projection(fields);
+    }
+
     SelectBuilder projection(TList...)(TList projection)
     if(TList.length == 0)
     {
-        return projection(null);
+        return this.projection(null);
     }
 
     SelectBuilder projection(TList...)(TList projection)
@@ -62,9 +79,7 @@ public:
             fields[index] = FieldNode.create(_table, field);
         }
 
-        _select.projection = fields;
-
-        return this;
+        return this.projection(fields);
     }
 
     SelectBuilder reorder()()
