@@ -119,6 +119,11 @@ abstract class Adapter
     }
 
     /++
+     + Runs a SELECT statement using a SIRL constructed query.
+     ++/
+    abstract QueryResult select(SelectBuilder sirl, string context = null);
+
+    /++
      + Closes the active connection, if open, and reconnects to the database.
      ++/
     abstract void reconnect();
