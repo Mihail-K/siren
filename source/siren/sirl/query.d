@@ -1,10 +1,10 @@
 
-module siren.sirl.table;
+module siren.sirl.query;
 
 import siren.sirl.node;
 import siren.sirl.select_builder;
 
-class Table
+class Query
 {
 private:
     string _table;
