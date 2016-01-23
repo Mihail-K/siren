@@ -13,6 +13,8 @@ interface NodeVisitor
 
     void visit(LimitNode node);
 
+    void visit(NotNode node);
+
     void visit(OffsetNode node);
 
     void visit(OrNode node);
