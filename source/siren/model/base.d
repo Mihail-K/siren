@@ -38,16 +38,18 @@ public:
             .fields(getNonIDColumnNames!E)
             .values(get(entity, getNonIDColumnFields!E));
 
-        // TODO : Run callbacks.
+        // Fire before entity-create callbacks.
+        fire!(CallbackEvent.BeforeCreate)(entity);
 
         auto result = adapter.insert(query, E.stringof);
 
-        // TODO : Run callbacks.
+        // Fire after entity-create callbacks.
+        fire!(CallbackEvent.AfterCreate)(entity);
 
         return true;
     }
 
-    private bool destroy(E entity)
+    bool destroy(E entity)
     {
         auto id = get(entity, getIDColumnField!E);
 
