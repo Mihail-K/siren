@@ -106,6 +106,31 @@ public:
         return this;
     }
 
+    SelectBuilder where()(ExpressionNode clause)
+    {
+        if(_select.where is null)
+        {
+            _select.where = new WhereNode;
+        }
+
+        _select.where.clauses ~= clause;
+
+        return this;
+    }
+
+    SelectBuilder where()(FieldNode left, ExpressionNode right)
+    {
+        return this.where(left.eq(right));
+    }
+
+    SelectBuilder where(T, V)(T field, V value)
+    {
+        auto left = FieldNode.create(_table, field);
+        auto right = LiteralNode.create(value);
+
+        return this.where(left, right);
+    }
+
     @property
     string table()
     {

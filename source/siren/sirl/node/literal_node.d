@@ -1,6 +1,7 @@
 
 module siren.sirl.node.literal_node;
 
+import siren.sirl.node.base;
 import siren.sirl.node.expression_node;
 import siren.sirl.node_visitor;
 

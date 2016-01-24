@@ -4,6 +4,7 @@ module siren.sirl.node.expression_node;
 import siren.sirl.node.and_node;
 import siren.sirl.node.arithmetic_node;
 import siren.sirl.node.base;
+import siren.sirl.node.equality_node;
 import siren.sirl.node.is_null_node;
 import siren.sirl.node.not_node;
 import siren.sirl.node.or_node;
@@ -17,6 +18,11 @@ abstract class ExpressionNode : Node
     ExpressionNode and(ExpressionNode node)
     {
         return new AndNode(this, node);
+    }
+
+    ExpressionNode eq(ExpressionNode node)
+    {
+        return new EqualityNode(this, EqualityOperator.Equals, node);
     }
 
     ExpressionNode ge(ExpressionNode node)
@@ -49,6 +55,11 @@ abstract class ExpressionNode : Node
     ExpressionNode lt(ExpressionNode node)
     {
         return new RelationNode(this, RelationOperator.LessThan, node);
+    }
+
+    ExpressionNode ne(ExpressionNode node)
+    {
+        return new EqualityNode(this, EqualityOperator.NotEquals, node);
     }
 
     @property
