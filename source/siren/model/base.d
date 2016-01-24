@@ -5,6 +5,9 @@ import siren.database;
 import siren.entity;
 import siren.sirl;
 
+import std.conv;
+import std.exception;
+
 class Model(E : Entity)
 {
 private:
@@ -36,7 +39,9 @@ public:
             .values(get(entity, getNonIDColumnFields!E));
 
         // TODO : Run callbacks.
-        // TODO : Write to database.
+
+        auto result = adapter.insert(query, E.stringof);
+
         // TODO : Run callbacks.
 
         return true;
@@ -49,7 +54,14 @@ public:
             .where(getIDColumnName!E, id)
             .limit(1);
 
-        return null;
+        auto result = adapter.select(query, E.stringof);
+        enforce(!result.empty, "No " ~ E.stringof ~ " with id `" ~ id.text ~ "` found.");
+
+        auto entity = new E;
+        auto row = result.front;
+        set(entity, row.columns, row.toArray);
+
+        return entity;
     }
 
     @property
@@ -80,7 +92,9 @@ public:
             .set(columns, values);
 
         // TODO : Run callbacks.
-        // TODO : Write to database.
+
+        auto result = adapter.update(query, E.stringof);
+
         // TODO : Run callbacks.
 
         return true;
