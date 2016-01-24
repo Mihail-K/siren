@@ -110,6 +110,16 @@ abstract class ExpressionNode : Node
         return new ArithmeticNode(this, ArithmeticOperator.BitOr, node);
     }
 
+    ExpressionNode opBinary(string op : "in")(ExpressionNode node)
+    {
+        return new InNode(this, InOperator.In, right);
+    }
+
+    ExpressionNode opBinary(string op : "!in")(ExpressionNode node)
+    {
+        return new InNode(this, InOperator.NotIn, right);
+    }
+
     ExpressionNode or(ExpressionNode node)
     {
         return new OrNode(this, node);
