@@ -16,8 +16,14 @@ private:
 public:
     this(string table)
     {
+        this(new TableNode(table));
+    }
+
+    this(TableNode table)
+    {
         _select = new SelectNode;
-        _table = table;
+        _select.table = table;
+        _table = table.table;
     }
 
     SelectBuilder limit(T)(T limit)

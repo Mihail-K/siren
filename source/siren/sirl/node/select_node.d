@@ -6,6 +6,7 @@ import siren.sirl.node.field_node;
 import siren.sirl.node.limit_node;
 import siren.sirl.node.offset_node;
 import siren.sirl.node.order_node;
+import siren.sirl.node.table_node;
 import siren.sirl.node.where_node;
 import siren.sirl.node_visitor;
 
@@ -16,6 +17,7 @@ private:
     OffsetNode _offset;
     OrderNode[] _orders;
     FieldNode[] _projection;
+    TableNode _table;
     WhereNode _where;
 
 public:
@@ -26,6 +28,11 @@ public:
         foreach(field; _projection)
         {
             visitor.visit(field);
+        }
+
+        if(_table !is null)
+        {
+            visitor.visit(_table);
         }
 
         if(_where !is null)
@@ -95,6 +102,18 @@ public:
     void projection(FieldNode[] projection)
     {
         _projection = projection;
+    }
+
+    @property
+    TableNode table()
+    {
+        return _table;
+    }
+
+    @property
+    void table(TableNode table)
+    {
+        _table = table;
     }
 
     @property
