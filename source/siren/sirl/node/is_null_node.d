@@ -26,16 +26,9 @@ private:
     }
 
 public:
-    @property
-    static IsNullNode NULL()
+    static IsNullNode create(bool negated = false)
     {
-        return _null;
-    }
-
-    @property
-    static IsNullNode NOT_NULL()
-    {
-        return _notNull;
+        return negated ? _notNull : _null;
     }
 
     override void accept(NodeVisitor visitor)

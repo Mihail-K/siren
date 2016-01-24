@@ -7,18 +7,18 @@ import siren.sirl.node_visitor;
 
 import std.string;
 
-enum ArithmeticOperator
+enum ArithmeticOperator : string
 {
-    Plus,
-    Minus,
-    Times,
-    Divide,
-    Modulo,
-    ShiftLeft,
-    ShiftRight,
-    BitAnd,
-    BitXor,
-    BitOr
+    Plus       = "+",
+    Minus      = "-",
+    Times      = "*",
+    Divide     = "/",
+    Modulo     = "%",
+    ShiftLeft  = ">>",
+    ShiftRight = "<<",
+    BitAnd     = "&",
+    BitXor     = "^",
+    BitOr      = "|"
 }
 
 class ArithmeticNode : BinaryNode

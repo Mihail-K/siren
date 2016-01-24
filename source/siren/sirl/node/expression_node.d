@@ -2,6 +2,7 @@
 module siren.sirl.node.expression_node;
 
 import siren.sirl.node.and_node;
+import siren.sirl.node.arithmetic_node;
 import siren.sirl.node.base;
 import siren.sirl.node.is_null_node;
 import siren.sirl.node.not_node;
@@ -31,13 +32,13 @@ abstract class ExpressionNode : Node
     @property
     ExpressionNode isNull()
     {
-        return IsNullNode.NULL;
+        return IsNullNode.create;
     }
 
     @property
     ExpressionNode isNotNull()
     {
-        return IsNullNode.NOT_NULL;
+        return IsNullNode.create(true);
     }
 
     ExpressionNode le(ExpressionNode node)
@@ -57,6 +58,56 @@ abstract class ExpressionNode : Node
     ExpressionNode not()
     {
         return new NotNode(this);
+    }
+
+    ExpressionNode opBinary(string op : "+")(ExpressionNode node)
+    {
+        return new ArithmeticNode(this, ArithmeticOperator.Plus, node);
+    }
+
+    ExpressionNode opBinary(string op : "-")(ExpressionNode node)
+    {
+        return new ArithmeticNode(this, ArithmeticOperator.Minus, node);
+    }
+
+    ExpressionNode opBinary(string op : "*")(ExpressionNode node)
+    {
+        return new ArithmeticNode(this, ArithmeticOperator.Times, node);
+    }
+
+    ExpressionNode opBinary(string op : "/")(ExpressionNode node)
+    {
+        return new ArithmeticNode(this, ArithmeticOperator.Divide, node);
+    }
+
+    ExpressionNode opBinary(string op : "%")(ExpressionNode node)
+    {
+        return new ArithmeticNode(this, ArithmeticOperator.Modulo, node);
+    }
+
+    ExpressionNode opBinary(string op : "<<")(ExpressionNode node)
+    {
+        return new ArithmeticNode(this, ArithmeticOperator.ShiftLeft, node);
+    }
+
+    ExpressionNode opBinary(string op : ">>")(ExpressionNode node)
+    {
+        return new ArithmeticNode(this, ArithmeticOperator.ShiftRight, node);
+    }
+
+    ExpressionNode opBinary(string op : "&")(ExpressionNode node)
+    {
+        return new ArithmeticNode(this, ArithmeticOperator.BitAnd, node);
+    }
+
+    ExpressionNode opBinary(string op : "^")(ExpressionNode node)
+    {
+        return new ArithmeticNode(this, ArithmeticOperator.BitXor, node);
+    }
+
+    ExpressionNode opBinary(string op : "|")(ExpressionNode node)
+    {
+        return new ArithmeticNode(this, ArithmeticOperator.BitOr, node);
     }
 
     ExpressionNode or(ExpressionNode node)
