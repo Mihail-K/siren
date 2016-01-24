@@ -25,6 +25,23 @@ public:
         return _adapter;
     }
 
+    private bool create(E entity)
+    {
+        // TODO : Run callbacks.
+        // TODO : Run validations.
+        // TODO : Run callbacks.
+
+        auto query = table.insert
+            .fields(getNonIDColumnNames!E)
+            .values(get(entity, getNonIDColumnFields!E));
+
+        // TODO : Run callbacks.
+        // TODO : Write to database.
+        // TODO : Run callbacks.
+
+        return true;
+    }
+
     static E find(IDType!E id)
     {
         auto query = table.select

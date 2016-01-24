@@ -106,6 +106,11 @@ abstract class Adapter
     }
 
     /++
+     + Runs an INSERT statement using a constructed SIRL query.
+     ++/
+    abstract InsertResult insert(InsertBuilder sirl, string context = null);
+
+    /++
      + Checks if there is an active transaction.
      ++/
     @property
@@ -130,7 +135,7 @@ abstract class Adapter
     }
 
     /++
-     + Runs a SELECT statement using a SIRL constructed query.
+     + Runs a SELECT statement using a constructed SIRL query.
      ++/
     abstract QueryResult select(SelectBuilder sirl, string context = null);
 

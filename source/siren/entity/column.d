@@ -3,6 +3,7 @@ module siren.entity.column;
 
 import siren.entity.attributes;
 import siren.entity.base;
+import siren.entity.id;
 import siren.entity.transient;
 
 import std.algorithm;
@@ -124,7 +125,6 @@ template getColumn(E : Entity, string field)
 
 template getColumns(E : Entity)
 {
-
     template _getColumn(string field)
     {
         enum _getColumn = getColumn!(E, field);
@@ -163,6 +163,36 @@ template getColumnFields(E : Entity)
     }
 
     alias getColumnFields = Filter!(_isColumn, FieldNameTuple!E);
+}
+
+template getNonIDColumns(E : Entity)
+{
+    template _getColumn(string field)
+    {
+        enum _getColumn = getColumn!(E, field);
+    }
+
+    alias getNonIDColumns = staticMap!(_getColumn, getNonIDColumnFields!E);
+}
+
+template getNonIDColumnFields(E : Entity)
+{
+    template _isNonIDColumn(string field)
+    {
+        enum _isNonIDColumn = isColumn!(E, field) && !isID!(E, field);
+    }
+
+    alias getNonIDColumnFields = Filter!(_isNonIDColumn, FieldNameTuple!E);
+}
+
+template getNonIDColumnNames(E : Entity)
+{
+    template _getColumnName(Column column)
+    {
+        enum _getColumnName = column.name;
+    }
+
+    alias getNonIDColumnNames = staticMap!(_getColumnName, getNonIDColumns!E);
 }
 
 template hasColumn(E : Entity, string column)
