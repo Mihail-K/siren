@@ -6,6 +6,7 @@ import siren.database.query_result;
 import siren.sirl;
 import siren.util;
 
+import std.functional;
 import std.typecons;
 import std.variant;
 
@@ -31,6 +32,9 @@ abstract class Adapter
      ++/
     abstract void connect();
 
+    /++
+     + Checks if the adapter has an open connection to a database.
+     ++/
     @property
     abstract void connected();
 
@@ -171,10 +175,7 @@ abstract class Adapter
     void transaction(scope bool function(Adapter adapter) callback)
     {
         // TODO : There's probably a better way.
-        this.transaction(delegate bool(Adapter adapter)
-        {
-            return callback(adapter);
-        });
+        this.transaction(callback.toDelegate);
     }
 
     abstract ulong update(EscapedString sql, string context);
