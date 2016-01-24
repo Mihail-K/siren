@@ -194,4 +194,9 @@ abstract class Adapter
     {
         return update(bind(sql, parameters), context);
     }
+
+    /++
+     + Runs an UPDATE statement using a constructed SIRL query.
+     ++/
+    abstract ulong update(UpdateBuilder sirl, string context = null);
 }
