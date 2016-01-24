@@ -63,4 +63,26 @@ public:
 
         return _table;
     }
+
+    private bool update(E entity)
+    {
+        // TODO : Run callbacks.
+        // TODO : Run validations.
+        // TODO : Run callbacks.
+
+        auto id = get(entity, getIDColumnField!E);
+
+        auto columns = getNonIDColumnNames!E;
+        auto values = get(entity, columns);
+
+        auto query = table.update
+            .where(getIDColumnName!E, id)
+            .set(columns, values);
+
+        // TODO : Run callbacks.
+        // TODO : Write to database.
+        // TODO : Run callbacks.
+
+        return true;
+    }
 }

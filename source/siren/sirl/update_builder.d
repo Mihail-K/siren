@@ -4,6 +4,8 @@ module siren.sirl.update_builder;
 import siren.sirl.node_visitor;
 import siren.sirl.node;
 
+import std.exception;
+
 class UpdateBuilder
 {
 private:
@@ -49,6 +51,22 @@ public:
         auto right = LiteralNode.create(value);
 
         return this.set(left, right);
+    }
+
+    UpdateBuilder set()(string[] fields, Nullable!Variant[] values)
+    {
+        enforce(fields.length == values.length, "Parameter count mismatch.");
+        auto sets = new AssignNode[fields.length];
+
+        foreach(field, value; fields.lockstep(values))
+        {
+            auto left = FieldNode.create(_table, field);
+            auto right = LiteralNode.create(value);
+
+            sets[index] = AssignNode.create(left, right);
+        }
+
+        return this.set(sets);
     }
 
     @property

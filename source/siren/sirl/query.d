@@ -4,6 +4,7 @@ module siren.sirl.query;
 import siren.sirl.node;
 import siren.sirl.insert_builder;
 import siren.sirl.select_builder;
+import siren.sirl.update_builder;
 
 class Query
 {
@@ -46,11 +47,9 @@ public:
         return new SelectBuilder(_table);
     }
 
-    alias UpdateBuilder = Object; // TODO
-
     @property
     UpdateBuilder update()
     {
-        return new UpdateBuilder;
+        return new UpdateBuilder(_table);
     }
 }
