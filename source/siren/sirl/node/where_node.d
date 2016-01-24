@@ -23,8 +23,14 @@ public:
         visitor.visit(this);
     }
 
+    void opOpAssign(string op : "~", T)(T clauses)
+    if(is(T : ExpressionNode) || is(T : ExpressionNode[]))
+    {
+        _clauses ~= clauses;
+    }
+
     @property
-    ref ExpressionNode[] clauses()
+    ExpressionNode[] clauses()
     {
         return _clauses;
     }

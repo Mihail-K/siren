@@ -22,4 +22,5 @@ public import siren.sirl.node.relation_node;
 public import siren.sirl.node.select_node;
 public import siren.sirl.node.table_node;
 public import siren.sirl.node.unary_node;
+public import siren.sirl.node.values_node;
 public import siren.sirl.node.where_node;

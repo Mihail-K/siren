@@ -116,10 +116,12 @@ public:
     {
         if(_select.where is null)
         {
-            _select.where = new WhereNode;
+            _select.where = new WhereNode(clause);
         }
-
-        _select.where.clauses ~= clause;
+        else
+        {
+            _select.where ~= clause;
+        }
 
         return this;
     }

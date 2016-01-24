@@ -23,6 +23,32 @@ public:
         _table = table.table;
     }
 
+    InsertBuilder values()(ExpressionNode[] values)
+    {
+        if(_insert.values is null)
+        {
+            _insert.values = new ValuesNode(values);
+        }
+        else
+        {
+            _insert.values ~= values;
+        }
+
+        return this;
+    }
+
+    InsertBuilder values(TList...)(TList values)
+    {
+        auto expressions = new ExpressionNode[TList.length];
+
+        foreach(index, value; values)
+        {
+            expressions[index] = LiteralNode.create(value);
+        }
+
+        return this.values(expressions);
+    }
+
     string toSql(NodeVisitor visitor)
     {
         visitor.visit(_insert);

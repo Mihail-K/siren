@@ -42,5 +42,7 @@ interface NodeVisitor
 
     void visit(TableNode node);
 
+    void visit(ValuesNode node);
+
     void visit(WhereNode node);
 }
