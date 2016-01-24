@@ -112,6 +112,18 @@ public:
         return this;
     }
 
+    @property
+    string table()
+    {
+        return _table;
+    }
+
+    string toSql(NodeVisitor visitor)
+    {
+        visitor.visit(_select);
+        return visitor.data;
+    }
+
     SelectBuilder where()(ExpressionNode clause)
     {
         if(_select.where is null)
@@ -137,17 +149,5 @@ public:
         auto right = LiteralNode.create(value);
 
         return this.where(left, right);
-    }
-
-    @property
-    string table()
-    {
-        return _table;
-    }
-
-    string toSql(NodeVisitor visitor)
-    {
-        visitor.visit(_select);
-        return visitor.data;
     }
 }

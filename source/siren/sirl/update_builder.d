@@ -75,6 +75,12 @@ public:
         return _table;
     }
 
+    string toSql(NodeVisitor visitor)
+    {
+        visitor.visit(_update);
+        return visitor.data;
+    }
+
     UpdateBuilder where(T)(T clauses)
     if(is(T : ExpressionNode) || is(T : ExpressionNode[]))
     {
