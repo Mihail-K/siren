@@ -14,5 +14,6 @@ public import siren.sirl.node.not_node;
 public import siren.sirl.node.offset_node;
 public import siren.sirl.node.or_node;
 public import siren.sirl.node.order_node;
+public import siren.sirl.node.relation_node;
 public import siren.sirl.node.select_node;
 public import siren.sirl.node.unary_node;

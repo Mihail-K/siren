@@ -25,5 +25,7 @@ interface NodeVisitor
 
     void visit(OrderNode node);
 
+    void visit(RelationNode node);
+
     void visit(SelectNode node);
 }
