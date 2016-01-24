@@ -5,6 +5,9 @@ import siren.sirl.node;
 
 interface NodeVisitor
 {
+    @property
+    string data();
+
     void visit(AndNode node);
 
     void visit(ArithmeticNode node);

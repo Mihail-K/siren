@@ -1,7 +1,7 @@
 
 module siren.sirl.insert_builder;
 
-import siren.sirl.generator;
+import siren.sirl.node_visitor;
 import siren.sirl.node;
 
 class InsertBuilder
@@ -23,9 +23,9 @@ public:
         _table = table.table;
     }
 
-    string toSql(Generator generator)
+    string toSql(NodeVisitor visitor)
     {
-        generator.visit(_insert);
-        return generator.data;
+        visitor.visit(_insert);
+        return visitor.data;
     }
 }

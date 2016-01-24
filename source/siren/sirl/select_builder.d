@@ -1,7 +1,7 @@
 
 module siren.sirl.select_builder;
 
-import siren.sirl.generator;
+import siren.sirl.node_visitor;
 import siren.sirl.node;
 
 import std.algorithm;
@@ -143,9 +143,9 @@ public:
         return _table;
     }
 
-    string toSql(Generator generator)
+    string toSql(NodeVisitor visitor)
     {
-        generator.visit(_select);
-        return generator.data;
+        visitor.visit(_select);
+        return visitor.data;
     }
 }
