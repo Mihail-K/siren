@@ -1,12 +1,12 @@
 
 module siren.sirl.node.field_node;
 
-import siren.sirl.node.base;
+import siren.sirl.node.expression_node;
 import siren.sirl.node_visitor;
 
 import std.string;
 
-class FieldNode : Node
+class FieldNode : ExpressionNode
 {
 private:
     string _field;

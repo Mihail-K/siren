@@ -11,7 +11,11 @@ interface NodeVisitor
 
     void visit(FieldNode node);
 
+    void visit(IsNullNode node);
+
     void visit(LimitNode node);
+
+    void visit(LiteralNode node);
 
     void visit(NotNode node);
 
