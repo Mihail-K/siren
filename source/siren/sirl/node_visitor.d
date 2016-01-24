@@ -32,4 +32,6 @@ interface NodeVisitor
     void visit(RelationNode node);
 
     void visit(SelectNode node);
+
+    void visit(WhereNode node);
 }

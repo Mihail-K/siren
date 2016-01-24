@@ -6,6 +6,7 @@ import siren.sirl.node.field_node;
 import siren.sirl.node.limit_node;
 import siren.sirl.node.offset_node;
 import siren.sirl.node.order_node;
+import siren.sirl.node.where_node;
 import siren.sirl.node_visitor;
 
 class SelectNode : Node
@@ -15,6 +16,7 @@ private:
     OffsetNode _offset;
     OrderNode[] _orders;
     FieldNode[] _projection;
+    WhereNode _where;
 
 public:
     override void accept(NodeVisitor visitor)
@@ -24,6 +26,11 @@ public:
         foreach(field; _projection)
         {
             visitor.visit(field);
+        }
+
+        if(_where !is null)
+        {
+            visitor.visit(_where);
         }
 
         foreach(order; _orders)
@@ -88,5 +95,17 @@ public:
     void projection(FieldNode[] projection)
     {
         _projection = projection;
+    }
+
+    @property
+    WhereNode where()
+    {
+        return _where;
+    }
+
+    @property
+    void where(WhereNode where)
+    {
+        _where = where;
     }
 }
