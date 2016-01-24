@@ -9,6 +9,8 @@ interface NodeVisitor
 
     void visit(ArithmeticNode node);
 
+    void visit(EqualityNode node);
+
     void visit(FieldNode node);
 
     void visit(IsNullNode node);
