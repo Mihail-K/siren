@@ -102,6 +102,12 @@ abstract class Adapter
     }
 
     /++
+     + Checks if there is an active transaction.
+     ++/
+    @property
+    abstract bool inTransaction();
+
+    /++
      + A human-readable name for the database adapter.
      ++/
     @property
@@ -138,6 +144,38 @@ abstract class Adapter
      + Starts a new database transaction.
      ++/
     abstract void transaction();
+
+    /++
+     + Executes a delegate in a transaction, commiting if the return value is true,
+     + and rolling-back if the result is false, or if an exception is thrown.
+     ++/
+    void transaction(scope bool delegate(Adapter adapter) callback)
+    {
+        transaction;
+        scope(failure) rollback;
+
+        if(callback(this))
+        {
+            commit;
+        }
+        else
+        {
+            rollback;
+        }
+    }
+
+    /++
+     + Executes a function in a transaction, commiting if the return value is true,
+     + and rolling-back if the result is false, or if an exception is thrown.
+     ++/
+    void transaction(scope bool function(Adapter adapter) callback)
+    {
+        // TODO : There's probably a better way.
+        this.transaction(delegate bool(Adapter adapter)
+        {
+            return callback(adapter);
+        });
+    }
 
     abstract ulong update(EscapedString sql, string context);
 
