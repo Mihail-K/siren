@@ -82,6 +82,12 @@ public:
         return this.values(expressions);
     }
 
+    @property
+    string table()
+    {
+        return _table;
+    }
+
     string toSql(NodeVisitor visitor)
     {
         visitor.visit(_insert);

@@ -40,7 +40,11 @@ interface NodeVisitor
 
     void visit(SelectNode node);
 
+    void visit(SetNode node);
+
     void visit(TableNode node);
+
+    void visit(UpdateNode node);
 
     void visit(ValuesNode node);
 
