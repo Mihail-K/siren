@@ -6,6 +6,7 @@ import siren.sirl.node.arithmetic_node;
 import siren.sirl.node.base;
 import siren.sirl.node.equality_node;
 import siren.sirl.node.is_null_node;
+import siren.sirl.node.literal_node;
 import siren.sirl.node.not_node;
 import siren.sirl.node.or_node;
 import siren.sirl.node.relation_node;
@@ -20,19 +21,25 @@ abstract class ExpressionNode : Node
         return new AndNode(this, node);
     }
 
-    ExpressionNode eq(ExpressionNode node)
+    ExpressionNode eq(T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new EqualityNode(this, EqualityOperator.Equals, node);
+        auto literal = LiteralNode.create(node);
+        return new EqualityNode(this, EqualityOperator.Equals, literal);
     }
 
-    ExpressionNode ge(ExpressionNode node)
+    ExpressionNode ge(T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new RelationNode(this, RelationOperator.GreaterOrEqual, node);
+        auto literal = LiteralNode.create(node);
+        return new RelationNode(this, RelationOperator.GreaterOrEqual, literal);
     }
 
-    ExpressionNode gt(ExpressionNode node)
+    ExpressionNode gt(T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new RelationNode(this, RelationOperator.GreaterThan, node);
+        auto literal = LiteralNode.create(node);
+        return new RelationNode(this, RelationOperator.GreaterThan, literal);
     }
 
     @property
@@ -47,19 +54,25 @@ abstract class ExpressionNode : Node
         return IsNullNode.create(true);
     }
 
-    ExpressionNode le(ExpressionNode node)
+    ExpressionNode le(T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new RelationNode(this, RelationOperator.LessOrEqual, node);
+        auto literal = LiteralNode.create(node);
+        return new RelationNode(this, RelationOperator.LessOrEqual, literal);
     }
 
-    ExpressionNode lt(ExpressionNode node)
+    ExpressionNode lt(T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new RelationNode(this, RelationOperator.LessThan, node);
+        auto literal = LiteralNode.create(node);
+        return new RelationNode(this, RelationOperator.LessThan, literal);
     }
 
-    ExpressionNode ne(ExpressionNode node)
+    ExpressionNode ne(T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new EqualityNode(this, EqualityOperator.NotEquals, node);
+        auto literal = LiteralNode.create(node);
+        return new EqualityNode(this, EqualityOperator.NotEquals, literal);
     }
 
     @property
@@ -71,64 +84,88 @@ abstract class ExpressionNode : Node
         return new NotNode(this);
     }
 
-    ExpressionNode opBinary(string op : "+")(ExpressionNode node)
+    ExpressionNode opBinary(string op : "+", T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new ArithmeticNode(this, ArithmeticOperator.Plus, node);
+        auto literal = LiteralNode.create(node);
+        return new ArithmeticNode(this, ArithmeticOperator.Plus, literal);
     }
 
-    ExpressionNode opBinary(string op : "-")(ExpressionNode node)
+    ExpressionNode opBinary(string op : "-", T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new ArithmeticNode(this, ArithmeticOperator.Minus, node);
+        auto literal = LiteralNode.create(node);
+        return new ArithmeticNode(this, ArithmeticOperator.Minus, literal);
     }
 
-    ExpressionNode opBinary(string op : "*")(ExpressionNode node)
+    ExpressionNode opBinary(string op : "*", T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new ArithmeticNode(this, ArithmeticOperator.Times, node);
+        auto literal = LiteralNode.create(node);
+        return new ArithmeticNode(this, ArithmeticOperator.Times, literal);
     }
 
-    ExpressionNode opBinary(string op : "/")(ExpressionNode node)
+    ExpressionNode opBinary(string op : "/", T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new ArithmeticNode(this, ArithmeticOperator.Divide, node);
+        auto literal = LiteralNode.create(node);
+        return new ArithmeticNode(this, ArithmeticOperator.Divide, literal);
     }
 
-    ExpressionNode opBinary(string op : "%")(ExpressionNode node)
+    ExpressionNode opBinary(string op : "%", T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new ArithmeticNode(this, ArithmeticOperator.Modulo, node);
+        auto literal = LiteralNode.create(node);
+        return new ArithmeticNode(this, ArithmeticOperator.Modulo, literal);
     }
 
-    ExpressionNode opBinary(string op : "<<")(ExpressionNode node)
+    ExpressionNode opBinary(string op : "<<", T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new ArithmeticNode(this, ArithmeticOperator.ShiftLeft, node);
+        auto literal = LiteralNode.create(node);
+        return new ArithmeticNode(this, ArithmeticOperator.ShiftLeft, literal);
     }
 
-    ExpressionNode opBinary(string op : ">>")(ExpressionNode node)
+    ExpressionNode opBinary(string op : ">>", T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new ArithmeticNode(this, ArithmeticOperator.ShiftRight, node);
+        auto literal = LiteralNode.create(node);
+        return new ArithmeticNode(this, ArithmeticOperator.ShiftRight, literal);
     }
 
-    ExpressionNode opBinary(string op : "&")(ExpressionNode node)
+    ExpressionNode opBinary(string op : "&", T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new ArithmeticNode(this, ArithmeticOperator.BitAnd, node);
+        auto literal = LiteralNode.create(node);
+        return new ArithmeticNode(this, ArithmeticOperator.BitAnd, literal);
     }
 
-    ExpressionNode opBinary(string op : "^")(ExpressionNode node)
+    ExpressionNode opBinary(string op : "^", T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new ArithmeticNode(this, ArithmeticOperator.BitXor, node);
+        auto literal = LiteralNode.create(node);
+        return new ArithmeticNode(this, ArithmeticOperator.BitXor, literal);
     }
 
-    ExpressionNode opBinary(string op : "|")(ExpressionNode node)
+    ExpressionNode opBinary(string op : "|", T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new ArithmeticNode(this, ArithmeticOperator.BitOr, node);
+        auto literal = LiteralNode.create(node);
+        return new ArithmeticNode(this, ArithmeticOperator.BitOr, literal);
     }
 
-    ExpressionNode opBinary(string op : "in")(ExpressionNode node)
+    ExpressionNode opBinary(string op : "in", T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new InNode(this, InOperator.In, right);
+        auto literal = LiteralNode.create(node);
+        return new InNode(this, InOperator.In, literal);
     }
 
-    ExpressionNode opBinary(string op : "!in")(ExpressionNode node)
+    ExpressionNode opBinary(string op : "!in", T)(T node)
+    if(!is(T : Node) || is(T : ExpressionNode))
     {
-        return new InNode(this, InOperator.NotIn, right);
+        auto literal = LiteralNode.create(node);
+        return new InNode(this, InOperator.NotIn, literal);
     }
 
     ExpressionNode or(ExpressionNode node)

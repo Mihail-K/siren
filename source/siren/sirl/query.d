@@ -29,6 +29,11 @@ public:
         return new FieldNode(_table, field);
     }
 
+    AssignNode opIndexAssign(ExpressionNode node, string field)
+    {
+        return new AssignNode(this[field], node);
+    }
+
     @property
     InsertBuilder insert()
     {

@@ -1,7 +1,10 @@
 
 module siren.sirl.node.field_node;
 
+import siren.sirl.node.assign_node;
+import siren.sirl.node.base;
 import siren.sirl.node.expression_node;
+import siren.sirl.node.literal_node;
 import siren.sirl.node_visitor;
 
 import std.string;
@@ -43,6 +46,13 @@ public:
     string field()
     {
         return _field ? _field : "*";
+    }
+
+    AssignNode opAssign(T)(T node)
+    if(!is(T : Node) || (is(T : ExpressionNode) && !is(T : FieldNode)))
+    {
+        auto literal = LiteralNode.create(node);
+        return new AssignNode(this, literal);
     }
 
     @property

@@ -3,6 +3,7 @@ module siren.sirl.node;
 
 public import siren.sirl.node.and_node;
 public import siren.sirl.node.arithmetic_node;
+public import siren.sirl.node.assign_node;
 public import siren.sirl.node.base;
 public import siren.sirl.node.binary_node;
 public import siren.sirl.node.equality_node;

@@ -12,6 +12,8 @@ interface NodeVisitor
 
     void visit(ArithmeticNode node);
 
+    void visit(AssignNode node);
+
     void visit(EqualityNode node);
 
     void visit(FieldNode node);
