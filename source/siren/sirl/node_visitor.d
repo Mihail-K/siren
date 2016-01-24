@@ -15,6 +15,8 @@ interface NodeVisitor
 
     void visit(InNode node);
 
+    void visit(InsertNode node);
+
     void visit(IsNullNode node);
 
     void visit(LimitNode node);

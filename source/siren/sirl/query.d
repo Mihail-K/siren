@@ -2,6 +2,7 @@
 module siren.sirl.query;
 
 import siren.sirl.node;
+import siren.sirl.insert_builder;
 import siren.sirl.select_builder;
 
 class Query
@@ -28,12 +29,10 @@ public:
         return new FieldNode(_table, field);
     }
 
-    alias InsertBuilder = Object; // TODO
-
     @property
     InsertBuilder insert()
     {
-        return new InsertBuilder;
+        return new InsertBuilder(_table);
     }
 
     @property

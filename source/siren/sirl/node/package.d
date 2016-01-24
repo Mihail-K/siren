@@ -9,6 +9,7 @@ public import siren.sirl.node.equality_node;
 public import siren.sirl.node.expression_node;
 public import siren.sirl.node.field_node;
 public import siren.sirl.node.in_node;
+public import siren.sirl.node.insert_node;
 public import siren.sirl.node.is_null_node;
 public import siren.sirl.node.limit_node;
 public import siren.sirl.node.literal_node;

@@ -24,36 +24,6 @@ public:
     override void accept(NodeVisitor visitor)
     {
         visitor.visit(this);
-
-        foreach(field; _projection)
-        {
-            visitor.visit(field);
-        }
-
-        if(_table !is null)
-        {
-            visitor.visit(_table);
-        }
-
-        if(_where !is null)
-        {
-            visitor.visit(_where);
-        }
-
-        foreach(order; _orders)
-        {
-            visitor.visit(order);
-        }
-
-        if(_limit !is null)
-        {
-            visitor.visit(_limit);
-        }
-
-        if(_offset !is null)
-        {
-            visitor.visit(_offset);
-        }
     }
 
     @property
