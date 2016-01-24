@@ -45,13 +45,13 @@ abstract class ExpressionNode : Node
     @property
     ExpressionNode isNull()
     {
-        return IsNullNode.create;
+        return new IsNullNode(this, IsNullOperator.IsNull);
     }
 
     @property
     ExpressionNode isNotNull()
     {
-        return IsNullNode.create(true);
+        return new IsNullNode(this, IsNullOperator.IsNotNull);
     }
 
     ExpressionNode le(T)(T node)

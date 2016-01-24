@@ -2,33 +2,28 @@
 module siren.sirl.node.is_null_node;
 
 import siren.sirl.node.expression_node;
+import siren.sirl.node.unary_node;
 import siren.sirl.node_visitor;
 
 import std.string;
 
-class IsNullNode : ExpressionNode
+enum IsNullOperator : string
+{
+    IsNull    = "IS NULL",
+    IsNotNull = "IS NOT NULL"
+}
+
+class IsNullNode : UnaryNode
 {
 private:
-    static IsNullNode _null;
-    static IsNullNode _notNull;
-
-    bool _negated;
-
-    static this()
-    {
-        _null = new IsNullNode(false);
-        _notNull = new IsNullNode(true);
-    }
-
-    this(bool negated)
-    {
-        _negated = negated;
-    }
+    IsNullOperator _operator;
 
 public:
-    static IsNullNode create(bool negated = false)
+    this(ExpressionNode operand, IsNullOperator operator)
     {
-        return negated ? _notNull : _null;
+        super(operand);
+
+        _operator = operator;
     }
 
     override void accept(NodeVisitor visitor)
@@ -37,13 +32,13 @@ public:
     }
 
     @property
-    bool negated()
+    IsNullOperator operator()
     {
-        return _negated;
+        return _operator;
     }
 
     override string toString()
     {
-        return "Is(%s)".format(_negated ? "Not Null" : "Null");
+        return "IsNull(%s %s)".format(operand, operator);
     }
 }
