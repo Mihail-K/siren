@@ -4,6 +4,9 @@ module siren.sirl.insert_builder;
 import siren.sirl.node_visitor;
 import siren.sirl.node;
 
+import std.typecons;
+import std.variant;
+
 class InsertBuilder
 {
 private:
@@ -56,6 +59,18 @@ public:
         return this.fields(mapped);
     }
 
+    @property
+    string table()
+    {
+        return _table;
+    }
+
+    string toSql(NodeVisitor visitor)
+    {
+        visitor.visit(_insert);
+        return visitor.data;
+    }
+
     InsertBuilder values()(ExpressionNode[] values)
     {
         if(_insert.values is null)
@@ -82,15 +97,15 @@ public:
         return this.values(expressions);
     }
 
-    @property
-    string table()
+    InsertBuilder values()(Nullable!Variant[] values)
     {
-        return _table;
-    }
+        auto expressions = new ExpressionNode[values.length];
 
-    string toSql(NodeVisitor visitor)
-    {
-        visitor.visit(_insert);
-        return visitor.data;
+        foreach(index, value; values)
+        {
+            expressions[index] = LiteralNode.create(value);
+        }
+
+        return this.values(expressions);
     }
 }

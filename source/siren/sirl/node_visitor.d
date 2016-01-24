@@ -14,6 +14,8 @@ interface NodeVisitor
 
     void visit(AssignNode node);
 
+    void visit(DeleteNode node);
+
     void visit(EqualityNode node);
 
     void visit(FieldNode node);

@@ -47,6 +47,19 @@ public:
         return true;
     }
 
+    private bool destroy(E entity)
+    {
+        auto id = get(entity, getIDColumnField!E);
+
+        auto columns = getNonIDColumnNames!E;
+        auto values = get(entity, columns);
+
+        auto query = table.destroy
+            .where(getIDColumnName!E, id);
+
+        return true;
+    }
+
     static E find(IDType!E id)
     {
         auto query = table.select

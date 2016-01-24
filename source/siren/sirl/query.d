@@ -2,6 +2,7 @@
 module siren.sirl.query;
 
 import siren.sirl.node;
+import siren.sirl.delete_builder;
 import siren.sirl.insert_builder;
 import siren.sirl.select_builder;
 import siren.sirl.update_builder;
@@ -17,12 +18,12 @@ public:
         _table = table;
     }
 
-    alias DeleteBuilder = Object; // TODO
+    alias delete_ = destroy;
 
     @property
     DeleteBuilder destroy()
     {
-        return new DeleteBuilder;
+        return new DeleteBuilder(_table);
     }
 
     FieldNode opIndex(string field)
