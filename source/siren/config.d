@@ -1,7 +1,11 @@
 
 module siren.config;
 
+import std.algorithm;
+import std.array;
 import std.exception;
+import std.stdio;
+import std.string;
 
 enum SirenProperty : string
 {
@@ -15,6 +19,12 @@ private:
     static bool _initialized;
 
 public:
+    @property
+    static string defaultAdapter()
+    {
+        return opIndex(SirenProperty.DefaultAdapter);
+    }
+
     static void initialize(string[string] configuration)
     {
         enforce(!_initialized, "Siren already initialized.");
@@ -23,10 +33,29 @@ public:
         _initialized = true;
     }
 
-    @property
-    static string defaultAdapter()
+    static void load(string[] files...)
     {
-        return opIndex(SirenProperty.DefaultAdapter);
+        load(files.map!(file => File(file, "r")).array);
+    }
+
+    static void load(File[] files...)
+    {
+        string[string] config;
+
+        foreach(file; files)
+        {
+            foreach(line; file.byLine)
+            {
+                auto index = line.countUntil('=');
+                if(index == -1) continue;
+
+                string key   = line[0 .. index].idup;
+                string value = line[index .. $].idup;
+                config[key]  = value;
+            }
+        }
+
+        initialize(config);
     }
 
     static string opIndex(string property)
