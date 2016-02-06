@@ -62,6 +62,11 @@ abstract class Adapter
     }
 
     /++
+     + Runs a DELETE statement using a constructed SIRL query.
+     ++/
+    abstract ulong destroy(DeleteBuilder sirl, string context = null);
+
+    /++
      + Closes the current database connection.
      ++/
     abstract void disconnect();
