@@ -33,12 +33,12 @@ public:
         _initialized = true;
     }
 
-    static void load(string[] files...)
+    static void load(string[] files = [ "config.siren" ]...)
     {
         load(files.map!(file => File(file, "r")).array);
     }
 
-    static void load(File[] files...)
+    static void load(File[] files)
     {
         string[string] config;
 
@@ -49,9 +49,11 @@ public:
                 auto index = line.countUntil('=');
                 if(index == -1) continue;
 
-                string key   = line[0 .. index].idup;
-                string value = line[index .. $].idup;
-                config[key]  = value;
+                string key   = line[0 .. index + 0].strip.idup;
+                string value = line[index + 1 .. $].strip.idup;
+                if(key.empty || value.empty) continue;
+
+                config[key] = value;
             }
         }
 
