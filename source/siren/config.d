@@ -1,5 +1,5 @@
 
-module siren.siren_config;
+module siren.config;
 
 import std.exception;
 
@@ -8,13 +8,11 @@ enum SirenProperty : string
     DefaultAdapter = "siren::default-adapter"
 }
 
-final class SirenConfig
+final class Config
 {
-public:
-
 private:
-    static bool _initialized;
     static string[string] _configuration;
+    static bool _initialized;
 
 public:
     static void initialize(string[string] configuration)

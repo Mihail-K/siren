@@ -1,7 +1,7 @@
 
 module siren.database.adapter_provider;
 
-import siren.siren_config;
+import siren.config;
 import siren.database.adapter;
 
 import std.exception;
@@ -40,7 +40,7 @@ public:
      + Retrieves an adapter with the given name, if one is registered.
      + The adapter is constructed when first accessed, and is cached thereafter.
      ++/
-    static T get(T : Adapter = Adapter)(string name = SirenConfig.defaultAdapter)
+    static T get(T : Adapter = Adapter)(string name = Config.defaultAdapter)
     {
         enforce(name !is null, "Cannot get adapter with null name.");
         auto cachePtr = name in _cachedAdapters;
