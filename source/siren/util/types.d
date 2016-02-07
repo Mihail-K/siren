@@ -26,3 +26,16 @@ if(isNullableWrapped!T)
 {
     alias UnwrapNullable = TemplateArgsOf!T[0];
 }
+
+alias Bool   = Nullable!bool;
+alias Char   = Nullable!char;
+alias Byte   = Nullable!byte;
+alias UByte  = Nullable!ubyte;
+alias Short  = Nullable!short;
+alias UShort = Nullable!ushort;
+alias Int    = Nullable!int;
+alias UInt   = Nullable!uint;
+alias Long   = Nullable!long;
+alias ULong  = Nullable!ulong;
+alias Float  = Nullable!float;
+alias Double = Nullable!double;
