@@ -8,30 +8,49 @@ import std.string;
 
 enum ColumnType : string
 {
-    BIGINT     = "BIGINT",
-    BLOB       = "BLOB",
-    BOOLEAN    = "BOOLEAN",
-    BOOL       = "BOOLEAN",
-    CHAR       = "CHAR",
-    DOUBLE     = "DOUBLE",
-    FLOAT      = "FLOAT",
-    INT        = "INT",
-    STRING     = "STRING",
-    TEXT       = "TEXT"
+    BigInt      = "BIGINT",
+    Binary      = "BINARY",
+    Blob        = "BLOB",
+    Byte        = TinyInt,
+    Char        = "CHAR",
+    Date        = "DATE",
+    DateTime    = "DATETIME",
+    Decimal     = "DECIMAL",
+    Double      = "DOUBLE",
+    Float       = "FLOAT",
+    Int         = "INT",
+    Long        = BigInt,
+    LongBlob    = "LONGBLOB",
+    LongText    = "LONGTEXT",
+    MediumBlob  = "MEDIUMBLOB",
+    MediumInt   = "MEDIUMINT",
+    MediumText  = "MEDIUMTEXT",
+    Short       = SmallInt,
+    SmallInt    = "SMALLINT",
+    String      = VarChar,
+    Text        = "TEXT",
+    Time        = "TIME",
+    TimeStamp   = "TIMESTAMP",
+    TinyBlob    = "TINYBLOB",
+    TinyInt     = "TINYINT",
+    TinyText    = "TINYTEXT",
+    VarBinary   = "VARBINARY",
+    VarChar     = "VARCHAR",
+    Year        = "YEAR"
 }
 
 @property
-ColumnType toColumnType(string type)
+ColumnType toColumnType(string name)
 {
-    foreach(name; __traits(allMembers, ColumnType))
+    foreach(member; __traits(allMembers, ColumnType))
     {
-        if(type == name)
+        if(name.toUpper == member.toUpper)
         {
-            return __traits(getMember, ColumnType, name);
+            return __traits(getMember, ColumnType, member);
         }
     }
 
-    assert(0);
+    assert(0, "No Column Type `" ~ name ~ "`.");
 }
 
 final shared class SchemaColumn
@@ -44,7 +63,7 @@ private:
 
     string _name;
     SchemaTable _table;
-    ColumnType _type = ColumnType.INT;
+    ColumnType _type;
 
 package:
     this(string name, shared SchemaTable table)
@@ -66,43 +85,69 @@ public:
         return _name;
     }
 
-    shared(SchemaColumn) nullable(bool nullable = true)
+    @property
+    bool nullable()
     {
-        _nullable = nullable;
-
-        return this;
+        return _nullable;
     }
 
-    shared(SchemaColumn) primary(bool primary = true)
+    @property
+    shared(SchemaColumn) nullable(bool nullable)
     {
-        _primary = primary;
-
-        return this;
+        return _nullable = nullable, this;
     }
 
+    @property
+    bool primary()
+    {
+        return _primary;
+    }
+
+    @property
+    shared(SchemaColumn) primary(bool primary)
+    {
+        return _primary = primary, this;
+    }
+
+    @property
+    ColumnType type()
+    {
+        return _type;
+    }
+
+    @property
     shared(SchemaColumn) type(ColumnType type)
     {
-        _type = type;
-
-        return this;
+        return _type = type, this;
     }
 
+    @property
     shared(SchemaColumn) type(string type)
     {
-        return this.type(type.toUpper.toColumnType);
+        return _type.toColumnType, this;
     }
 
-    shared(SchemaColumn) unsigned(bool unsigned = true)
+    @property
+    bool unsigned()
     {
-        _unsigned = unsigned;
-
-        return this;
+        return _unsigned;
     }
 
-    shared(SchemaColumn) zerofill(bool zerofill = true)
+    @property
+    shared(SchemaColumn) unsigned(bool unsigned)
     {
-        _zerofill = zerofill;
+        return _unsigned = unsigned, this;
+    }
 
-        return this;
+    @property
+    bool zerofill()
+    {
+        return _zerofill;
+    }
+
+    @property
+    shared(SchemaColumn) zerofill(bool zerofill)
+    {
+        return _zerofill = zerofill, this;
     }
 }
