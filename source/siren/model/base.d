@@ -60,6 +60,15 @@ public:
         auto query = table.destroy
             .where(getIDColumnName!E, id);
 
+        // Fire before entity-destroy callbacks.
+        fire!(CallbackEvent.BeforeDestroy)(entity);
+
+        auto result = adapter.destroy(query, E.stringof);
+        enforce(result != 0, "Entity `" ~ E.stringof ~ "` with id `" ~ id.text ~ "` not destroyed.");
+
+        // Fire after entity-destroy callbacks.
+        fire!(CallbackEvent.AfterDestroy)(entity);
+
         return true;
     }
 
