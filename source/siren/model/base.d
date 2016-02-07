@@ -4,6 +4,7 @@ module siren.model.base;
 import siren.database;
 import siren.entity;
 import siren.sirl;
+import siren.util;
 
 import std.conv;
 import std.exception;
@@ -77,6 +78,15 @@ public:
         set(entity, row.columns, row.toArray);
 
         return entity;
+    }
+
+    static if(isNullableWrapped!(IDType!E))
+    {
+        static E find(UnwrapNullable!(IDType!E) id)
+        {
+            IDType!E realId = id;
+            return find(realId);
+        }
     }
 
     @property
