@@ -16,5 +16,8 @@ abstract class QueryResult
 
     void popFront();
 
+    @property
+    QueryResult save();
+
     void reset();
 }
