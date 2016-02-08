@@ -4,7 +4,7 @@ module siren.database.query_row;
 import std.typecons;
 import std.variant;
 
-interface QueryRow
+abstract class QueryRow
 {
     @property
     string[] columns();

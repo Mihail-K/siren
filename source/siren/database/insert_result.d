@@ -3,7 +3,7 @@ module siren.database.insert_result;
 
 import std.typecons;
 
-interface InsertResult
+abstract class InsertResult
 {
     @property
     ulong count();
