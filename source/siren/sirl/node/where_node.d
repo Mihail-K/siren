@@ -15,7 +15,7 @@ private:
 public:
     this(ExpressionNode[] clauses = []...)
     {
-        _clauses = clauses;
+        _clauses = clauses.dup;
     }
 
     override void accept(NodeVisitor visitor)

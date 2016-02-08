@@ -113,6 +113,12 @@ public:
     }
 
     @property
+    SelectNode select()
+    {
+        return _select;
+    }
+
+    @property
     string table()
     {
         return _table;

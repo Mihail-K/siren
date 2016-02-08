@@ -75,7 +75,7 @@ public:
     }
 
     @property
-    Variant value()
+    Nullable!Variant value()
     {
         return _value;
     }

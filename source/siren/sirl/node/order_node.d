@@ -8,10 +8,10 @@ import siren.sirl.node_visitor;
 import std.exception;
 import std.string;
 
-enum OrderDirection
+enum OrderDirection : string
 {
-    Asc,
-    Desc
+    Asc  = "ASC",
+    Desc = "DESC"
 }
 
 private OrderDirection fromName(string name)

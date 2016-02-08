@@ -15,7 +15,7 @@ private:
 public:
     this(AssignNode[] sets = []...)
     {
-        _sets = sets;
+        _sets = sets.dup;
     }
 
     override void accept(NodeVisitor visitor)

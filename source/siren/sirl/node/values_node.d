@@ -15,7 +15,7 @@ private:
 public:
     this(ExpressionNode[] values)
     {
-        _values = values;
+        _values = values.dup;
     }
 
     override void accept(NodeVisitor visitor)
