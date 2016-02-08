@@ -1,7 +1,6 @@
 
 module siren.sirl.delete_builder;
 
-import siren.sirl.node_visitor;
 import siren.sirl.node;
 
 class DeleteBuilder
@@ -24,15 +23,15 @@ public:
     }
 
     @property
+    DeleteNode node()
+    {
+        return _delete;
+    }
+
+    @property
     string table()
     {
         return table;
-    }
-
-    string toSql(NodeVisitor visitor)
-    {
-        visitor.visit(_delete);
-        return visitor.data;
     }
 
     DeleteBuilder where(T)(T clauses)

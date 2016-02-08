@@ -1,7 +1,6 @@
 
 module siren.sirl.insert_builder;
 
-import siren.sirl.node_visitor;
 import siren.sirl.node;
 
 import std.typecons;
@@ -60,15 +59,15 @@ public:
     }
 
     @property
+    InsertNode node()
+    {
+        return _insert;
+    }
+
+    @property
     string table()
     {
         return _table;
-    }
-
-    string toSql(NodeVisitor visitor)
-    {
-        visitor.visit(_insert);
-        return visitor.data;
     }
 
     InsertBuilder values()(ExpressionNode[] values)

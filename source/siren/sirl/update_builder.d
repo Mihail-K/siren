@@ -1,7 +1,6 @@
 
 module siren.sirl.update_builder;
 
-import siren.sirl.node_visitor;
 import siren.sirl.node;
 
 import std.exception;
@@ -23,6 +22,12 @@ public:
         _update = new UpdateNode;
         _update.table = table;
         _table = table.table;
+    }
+
+    @property
+    UpdateNode node()
+    {
+        return _update;
     }
 
     UpdateBuilder set(T)(T sets)
@@ -73,12 +78,6 @@ public:
     string table()
     {
         return _table;
-    }
-
-    string toSql(NodeVisitor visitor)
-    {
-        visitor.visit(_update);
-        return visitor.data;
     }
 
     UpdateBuilder where(T)(T clauses)

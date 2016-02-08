@@ -1,7 +1,6 @@
 
 module siren.sirl.select_builder;
 
-import siren.sirl.node_visitor;
 import siren.sirl.node;
 
 import std.algorithm;
@@ -31,6 +30,12 @@ public:
         _select.limit = LimitNode.create(limit);
 
         return this;
+    }
+
+    @property
+    SelectNode node()
+    {
+        return _select;
     }
 
     SelectBuilder offset(T)(T offset)
@@ -113,21 +118,9 @@ public:
     }
 
     @property
-    SelectNode select()
-    {
-        return _select;
-    }
-
-    @property
     string table()
     {
         return _table;
-    }
-
-    string toSql(NodeVisitor visitor)
-    {
-        visitor.visit(_select);
-        return visitor.data;
     }
 
     SelectBuilder where()(ExpressionNode clause)
