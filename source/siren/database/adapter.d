@@ -36,7 +36,7 @@ abstract class Adapter
      + Checks if the adapter has an open connection to a database.
      ++/
     @property
-    abstract void connected();
+    abstract bool connected();
 
     /++
      + The raw database connection object used by the adapter.
@@ -91,7 +91,10 @@ abstract class Adapter
     /++
      + Adds a hook function to be executed once the current transaction ends.
      ++/
-    void hook(scope void function(bool success) callback);
+    void hook(scope void function(bool success) callback)
+    {
+        this.hook(callback.toDelegate);
+    }
 
     /++
      + Adds a hook delegate to be executed once the current transaction ends.
