@@ -91,7 +91,7 @@ abstract class Adapter
     /++
      + Adds a hook function to be executed once the current transaction ends.
      ++/
-    void hook(scope void function(bool success) callback)
+    void hook(void function(bool success) callback)
     {
         this.hook(callback.toDelegate);
     }
@@ -99,7 +99,7 @@ abstract class Adapter
     /++
      + Adds a hook delegate to be executed once the current transaction ends.
      ++/
-    void hook(scope void delegate(bool success) callback);
+    void hook(void delegate(bool success) callback);
 
     abstract InsertResult insert(EscapedString sql, string context);
 
