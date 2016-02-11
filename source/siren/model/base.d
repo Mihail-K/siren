@@ -32,10 +32,16 @@ public:
             _adapter = AdapterProvider.get;
         }
 
+        if(!_adapter.connected)
+        {
+            // Connect to DB.
+            _adapter.connect;
+        }
+
         return _adapter;
     }
 
-    private bool create(E entity)
+    static bool create(E entity)
     {
         // TODO : Run callbacks.
         // TODO : Run validations.
@@ -62,7 +68,7 @@ public:
         return result.count != 0;
     }
 
-    bool destroy(E entity)
+    static bool destroy(E entity)
     {
         auto query = table.destroy
             .where(getIDColumnName!E, getID(entity));
@@ -111,7 +117,7 @@ public:
         }
     }
 
-    Nullable!Variant getID(E entity)
+    static Nullable!Variant getID(E entity)
     {
         return get!(E, getIDColumnField!E)(entity);
     }
@@ -131,7 +137,7 @@ public:
     @property
     enum string tableName = getTableName!E;
 
-    private bool update(E entity)
+    static bool update(E entity)
     {
         // TODO : Run callbacks.
         // TODO : Run validations.
