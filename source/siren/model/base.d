@@ -54,7 +54,7 @@ public:
         InsertResult result;
         auto query = table.insert
             .fields(getNonIDColumnNames!E)
-            .values(get(entity, getNonIDColumnFields!E));
+            .values(get(entity, [ getNonIDColumnFields!E ]));
 
         // Run in a transaction.
         transaction(false, (adapter) {
@@ -199,7 +199,7 @@ public:
         // Fire after entity-validation callbacks.
         fire!(CallbackEvent.AfterValidation)(entity);
 
-        auto columns = getNonIDColumnNames!E;
+        auto columns = [ getNonIDColumnNames!E ];
         auto values = get(entity, columns);
 
         ulong result;
