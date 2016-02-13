@@ -165,11 +165,11 @@ abstract class Adapter
 
     /++
      + Executes a delegate in a transaction, rolling-back if an exception is thrown.
-     + This won't created a nested transaction if one is already active.
+     + This will created a nested transaction if one is already active.
      ++/
     void transaction(void delegate(Adapter adapter) callback)
     {
-        this.transaction(false, callback);
+        this.transaction(true, callback);
     }
 
     /++
@@ -217,11 +217,11 @@ abstract class Adapter
 
     /++
      + Executes a function in a transaction, rolling-back if an exception is thrown.
-     + This won't created a nested transaction if one is already active.
+     + This will created a nested transaction if one is already active.
      ++/
     void transaction(void function(Adapter adapter) callback)
     {
-        this.transaction(false, callback);
+        this.transaction(true, callback);
     }
 
     /++

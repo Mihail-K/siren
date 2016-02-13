@@ -53,7 +53,7 @@ public:
             .values(get(entity, getNonIDColumnFields!E));
 
         // Run in a transaction.
-        adapter.transaction((adapter) {
+        adapter.transaction(false, (adapter) {
             // Fire before entity-create callbacks.
             fire!(CallbackEvent.BeforeCreate)(entity);
 
@@ -79,7 +79,7 @@ public:
             .where(getIDColumnName!E, getID(entity));
 
         // Run in a transaction.
-        adapter.transaction((adapter) {
+        adapter.transaction(false, (adapter) {
             // Fire before entity-destroy callbacks.
             fire!(CallbackEvent.BeforeDestroy)(entity);
 
@@ -163,7 +163,7 @@ public:
             .set(columns, values);
 
         // Run in a transaction.
-        adapter.transaction((adapter) {
+        adapter.transaction(false, (adapter) {
             // Fire before entity-update callbacks.
             fire!(CallbackEvent.BeforeUpdate)(entity);
 
