@@ -82,9 +82,6 @@ public:
     }
 
     @property
-    abstract E take();
-
-    @property
     Association!(E) where(ExpressionNode node)
     {
         _builder.where(node);

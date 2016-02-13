@@ -6,6 +6,7 @@ import siren.entity;
 import siren.model.base;
 import siren.sirl;
 
+import std.range;
 import std.typecons;
 import std.variant;
 
@@ -66,12 +67,5 @@ public:
         {
             _result.popFront;
         }
-    }
-
-    @property
-    override E take()
-    {
-        auto entity = this.front;
-        return popFront, entity;
     }
 }
