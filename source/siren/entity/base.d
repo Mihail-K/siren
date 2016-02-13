@@ -55,36 +55,8 @@ Nullable!Variant[] get(E : Entity)(E entity, string[] fields)
 
 void set(E : Entity, string field)(E entity, Nullable!Variant value)
 {
-    alias member = Alias!(__traits(getMember, E, field));
-
-    if(value.isNull)
-    {
-        static if(isNullAssignable!(typeof(member)))
-        {
-            __traits(getMember, entity, field) = null;
-        }
-        else static if(isNullableWrapped!(typeof(member)))
-        {
-            __traits(getMember, entity, field).nullify;
-        }
-        else
-        {
-            enforce(false, "Field `" ~ field ~ "` in Entity ~ `" ~ E.stringof ~ "` cannot be null.");
-        }
-    }
-    else
-    {
-        static if(isNullableWrapped!(typeof(member)))
-        {
-            auto unpacked = value.get.coerce!(UnwrapNullable!(typeof(member)));
-        }
-        else
-        {
-            auto unpacked = value.get.coerce!(typeof(member));
-        }
-
-        __traits(getMember, entity, field) = unpacked;
-    }
+    alias Type = typeof(__traits(getMember, E, field));
+    __traits(getMember, entity, field) = value.fromNullableVariant!Type;
 }
 
 void set(E : Entity)(E entity, string field, Nullable!Variant value)

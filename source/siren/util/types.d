@@ -41,12 +41,49 @@ Nullable!Variant toNullableVariant(T)(T value)
             nv = Variant(value.get);
         }
     }
+    else static if(is(T == struct))
+    {
+        T *ptr = new T;
+        *ptr = value;
+
+        nv = Variant(ptr);
+    }
     else
     {
         nv = Variant(value);
     }
 
     return nv;
+}
+
+@property
+T fromNullableVariant(T)(Nullable!Variant value)
+{
+    if(value.isNull)
+    {
+        return T.init;
+    }
+    else
+    {
+        static if(isNullAssignable!T)
+        {
+            return value.get.get!T;
+        }
+        else static if(isNullableWrapped!T)
+        {
+            T result = value.get.get!(UnwrapNullable!T);
+            return result;
+        }
+        else static if(is(T == struct))
+        {
+            T *ptr = value.get.get!(T *);
+            return *ptr;
+        }
+        else
+        {
+            return value.get.get!T;
+        }
+    }
 }
 
 template UnwrapNullable(T)
