@@ -47,22 +47,26 @@ public:
         // TODO : Run validations.
         // TODO : Run callbacks.
 
+        InsertResult result;
         auto query = table.insert
             .fields(getNonIDColumnNames!E)
             .values(get(entity, getNonIDColumnFields!E));
 
-        // Fire before entity-create callbacks.
-        fire!(CallbackEvent.BeforeCreate)(entity);
+        // Run in a transaction.
+        adapter.transaction((adapter) {
+            // Fire before entity-create callbacks.
+            fire!(CallbackEvent.BeforeCreate)(entity);
 
-        // Run the insert query and fetch the result.
-        auto result = adapter.insert(query, E.stringof);
+            // Run the insert query and fetch the result.
+            result = adapter.insert(query, E.stringof);
 
-        // Set the entity ID from the query result.
-        Nullable!Variant id = Variant(result.lastInsertID.get);
-        set!(E, getIDColumnField!E)(entity, id);
+            // Set the entity ID from the query result.
+            Nullable!Variant id = Variant(result.lastInsertID.get);
+            set!(E, getIDColumnField!E)(entity, id);
 
-        // Fire after entity-create callbacks.
-        fire!(CallbackEvent.AfterCreate)(entity);
+            // Fire after entity-create callbacks.
+            fire!(CallbackEvent.AfterCreate)(entity);
+        });
 
         // Ensure changes were made.
         return result.count != 0;
@@ -70,20 +74,24 @@ public:
 
     static bool destroy(E entity)
     {
+        ulong result;
         auto query = table.destroy
             .where(getIDColumnName!E, getID(entity));
 
-        // Fire before entity-destroy callbacks.
-        fire!(CallbackEvent.BeforeDestroy)(entity);
+        // Run in a transaction.
+        adapter.transaction((adapter) {
+            // Fire before entity-destroy callbacks.
+            fire!(CallbackEvent.BeforeDestroy)(entity);
 
-        // Run the delete query and fetch the result.
-        auto result = adapter.destroy(query, E.stringof);
+            // Run the delete query and fetch the result.
+            result = adapter.destroy(query, E.stringof);
 
-        // Ensure that the entity was removed from the database.
-        enforce(result != 0, EntityNotDestroyedException.create(entity));
+            // Ensure that the entity was removed from the database.
+            enforce(result != 0, EntityNotDestroyedException.create(entity));
 
-        // Fire after entity-destroy callbacks.
-        fire!(CallbackEvent.AfterDestroy)(entity);
+            // Fire after entity-destroy callbacks.
+            fire!(CallbackEvent.AfterDestroy)(entity);
+        });
 
         return result != 0;
     }
@@ -149,21 +157,25 @@ public:
         auto columns = getNonIDColumnNames!E;
         auto values = get(entity, columns);
 
+        ulong result;
         auto query = table.update
             .where(getIDColumnName!E, getID(entity))
             .set(columns, values);
 
-        // Fire before entity-update callbacks.
-        fire!(CallbackEvent.BeforeUpdate)(entity);
+        // Run in a transaction.
+        adapter.transaction((adapter) {
+            // Fire before entity-update callbacks.
+            fire!(CallbackEvent.BeforeUpdate)(entity);
 
-        // Run the delete query and fetch the result.
-        auto result = adapter.update(query, E.stringof);
+            // Run the delete query and fetch the result.
+            result = adapter.update(query, E.stringof);
 
-        // Ensure that the entity was updated in the database.
-        enforce(result != 0, EntityNotUpdatedException.create(entity));
+            // Ensure that the entity was updated in the database.
+            enforce(result != 0, EntityNotUpdatedException.create(entity));
 
-        // Fire after entity-update callbacks.
-        fire!(CallbackEvent.AfterUpdate)(entity);
+            // Fire after entity-update callbacks.
+            fire!(CallbackEvent.AfterUpdate)(entity);
+        });
 
         // Ensure changes were made.
         return result != 0;
