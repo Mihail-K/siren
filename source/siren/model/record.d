@@ -22,4 +22,17 @@ private:
     }
 
     alias _model this;
+
+public:
+    @property
+    bool destroy()
+    {
+        return _model.destroy(this);
+    }
+
+    @property
+    bool save()
+    {
+        return _model.save(this);
+    }
 }
