@@ -143,6 +143,21 @@ public:
         return get!(E, getIDColumnField!E)(entity);
     }
 
+    static bool save(E entity)
+    {
+        auto id = getID(entity);
+
+        // Check if the entity has its ID field set.
+        if(id.isNull || id.get.get!(IDType!E) == IDType!E.init)
+        {
+            return create(entity);
+        }
+        else
+        {
+            return update(entity);
+        }
+    }
+
     @property
     static Query table()
     {
