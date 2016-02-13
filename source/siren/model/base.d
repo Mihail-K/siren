@@ -53,7 +53,7 @@ public:
             .values(get(entity, getNonIDColumnFields!E));
 
         // Run in a transaction.
-        adapter.transaction(false, (adapter) {
+        transaction(false, (adapter) {
             // Fire before entity-create callbacks.
             fire!(CallbackEvent.BeforeCreate)(entity);
 
@@ -79,7 +79,7 @@ public:
             .where(getIDColumnName!E, getID(entity));
 
         // Run in a transaction.
-        adapter.transaction(false, (adapter) {
+        transaction(false, (adapter) {
             // Fire before entity-destroy callbacks.
             fire!(CallbackEvent.BeforeDestroy)(entity);
 
@@ -154,6 +154,22 @@ public:
     @property
     enum string tableName = getTableName!E;
 
+    /++
+     + Forwards to the Model's adapter's transaction function.
+     ++/
+    static void transaction(void delegate(Adapter) callback)
+    {
+        adapter.transaction(callback);
+    }
+
+    /++
+     + Ditto.
+     ++/
+    static void transaction(bool nested, void delegate(Adapter) callback)
+    {
+        adapter.transaction(nested, callback);
+    }
+
     static bool update(E entity)
     {
         // TODO : Run callbacks.
@@ -169,7 +185,7 @@ public:
             .set(columns, values);
 
         // Run in a transaction.
-        adapter.transaction(false, (adapter) {
+        transaction(false, (adapter) {
             // Fire before entity-update callbacks.
             fire!(CallbackEvent.BeforeUpdate)(entity);
 
