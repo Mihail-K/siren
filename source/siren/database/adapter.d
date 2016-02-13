@@ -198,6 +198,12 @@ abstract class Adapter
                 if(started) rollback;
             }
 
+            scope(success)
+            {
+                // Commit on success.
+                if(started) commit;
+            }
+
             callback(this);
         }
         catch(Rollback r)
