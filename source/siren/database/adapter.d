@@ -3,6 +3,7 @@ module siren.database.adapter;
 
 import siren.database.insert_result;
 import siren.database.query_result;
+import siren.database.rollback;
 import siren.sirl;
 import siren.util;
 
@@ -163,32 +164,71 @@ abstract class Adapter
     abstract void transaction();
 
     /++
-     + Executes a delegate in a transaction, commiting if the return value is true,
-     + and rolling-back if the result is false, or if an exception is thrown.
+     + Executes a delegate in a transaction, rolling-back if an exception is thrown.
+     + This won't created a nested transaction if one is already active.
      ++/
-    void transaction(scope bool delegate(Adapter adapter) callback)
+    void transaction(void delegate(Adapter adapter) callback)
     {
-        transaction;
-        scope(failure) rollback;
+        this.transaction(false, callback);
+    }
 
-        if(callback(this))
+    /++
+     + Ditto
+     +
+     + Params:
+     +   nested   = If true, a nested transaction will be started.
+     +   callback = The delegate to wrap in a transaction.
+     ++/
+    void transaction(bool nested, void delegate(Adapter adapter) callback)
+    {
+        try
         {
-            commit;
+            bool started;
+
+            // Start a new transaction.
+            if(!inTransaction || nested)
+            {
+                transaction;
+                started = true;
+            }
+
+            scope(failure)
+            {
+                // Rollback on failure.
+                if(started) rollback;
+            }
+
+            callback(this);
         }
-        else
+        catch(Rollback r)
         {
-            rollback;
+            if(r.propogate)
+            {
+                throw r;
+            }
         }
     }
 
     /++
-     + Executes a function in a transaction, commiting if the return value is true,
-     + and rolling-back if the result is false, or if an exception is thrown.
+     + Executes a function in a transaction, rolling-back if an exception is thrown.
+     + This won't created a nested transaction if one is already active.
      ++/
-    void transaction(scope bool function(Adapter adapter) callback)
+    void transaction(void function(Adapter adapter) callback)
+    {
+        this.transaction(false, callback);
+    }
+
+    /++
+     + Ditto
+     +
+     + Params:
+     +   nested   = If true, a nested transaction will be started.
+     +   callback = The function to wrap in a transaction.
+     ++/
+    void transaction(bool nested, void function(Adapter adapter) callback)
     {
         // TODO : There's probably a better way.
-        this.transaction(callback.toDelegate);
+        this.transaction(nested, callback.toDelegate);
     }
 
     abstract ulong update(EscapedString sql, string context);
