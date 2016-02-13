@@ -115,7 +115,7 @@ Coloured dark(Coloured output)
 }
 
 @property
-Coloured uncolour(Coloured output)
+Coloured uncolour(T)(T output)
 {
     return Coloured(cast(Colour) Colour.initial, output.text);
 }
