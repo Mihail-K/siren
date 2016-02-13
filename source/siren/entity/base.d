@@ -131,3 +131,32 @@ void set(E : Entity)(E entity, string[] fields, Nullable!Variant[] values)
         set(entity, field, value);
     }
 }
+
+void set(E : Entity, TList...)(E entity, string[] fields, TList args)
+{
+    auto values = new Nullable!Variant[args.length];
+
+    foreach(index, argument; args)
+    {
+        static if(isNullAssignable!(typeof(argument)))
+        {
+            if(argument !is null)
+            {
+                values[index] = Variant(argument);
+            }
+        }
+        else static if(isNullableWrapped!(typeof(argument)))
+        {
+            if(!argument.isNull)
+            {
+                values[index] = Variant(argument.get);
+            }
+        }
+        else
+        {
+            values[index] = Variant(argument);
+        }
+    }
+
+    set(entity, fields, values);
+}
