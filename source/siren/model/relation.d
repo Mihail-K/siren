@@ -1,5 +1,5 @@
 
-module siren.model.association;
+module siren.model.relation;
 
 import siren.database;
 import siren.entity;
@@ -10,7 +10,7 @@ import std.range;
 import std.typecons;
 import std.variant;
 
-class ModelAssociation(M : Model!E, E : Entity) : Association!(E)
+class ModelRelation(M : Model!E, E : Entity) : Relation!(E)
 {
 private:
     Adapter _adapter;

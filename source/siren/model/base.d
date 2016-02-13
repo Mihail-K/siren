@@ -3,8 +3,8 @@ module siren.model.base;
 
 import siren.database;
 import siren.entity;
-import siren.model.association;
 import siren.model.exception;
+import siren.model.relation;
 import siren.sirl;
 import siren.util;
 
@@ -40,12 +40,6 @@ public:
         }
 
         return _adapter;
-    }
-
-    @property
-    static auto association()
-    {
-        return new ModelAssociation!(typeof(this))(table.select, adapter, tableName);
     }
 
     static bool create(E entity)
@@ -155,6 +149,12 @@ public:
         return table[column];
     }
 
+    @property
+    static auto relation()
+    {
+        return new ModelRelation!(typeof(this))(table.select, adapter, tableName);
+    }
+
     static bool save(E entity)
     {
         auto id = getID(entity);
@@ -240,8 +240,8 @@ public:
 
     @property
     static auto where(TList...)(TList args)
-    if(__traits(compiles, { association.where(args); }))
+    if(__traits(compiles, { relation.where(args); }))
     {
-        return association.where(args);
+        return relation.where(args);
     }
 }

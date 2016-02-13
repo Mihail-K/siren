@@ -1,5 +1,5 @@
 
-module siren.entity.association;
+module siren.entity.relation;
 
 import siren.entity.base;
 import siren.sirl;
@@ -8,7 +8,7 @@ import siren.util.types;
 import std.typecons;
 import std.variant;
 
-abstract class Association(E : Entity)
+abstract class Relation(E : Entity)
 {
 private:
     SelectBuilder _builder;
@@ -32,7 +32,7 @@ public:
     abstract E front();
 
     @property
-    Association!(E) limit(ulong limit)
+    Relation!(E) limit(ulong limit)
     {
         _builder.limit(limit);
 
@@ -40,7 +40,7 @@ public:
     }
 
     @property
-    Association!(E) offset(ulong offset)
+    Relation!(E) offset(ulong offset)
     {
         _builder.offset(offset);
 
@@ -48,7 +48,7 @@ public:
     }
 
     @property
-    Association!(E) order(string field, string direction = "asc")
+    Relation!(E) order(string field, string direction = "asc")
     {
         _builder.order(field, direction);
 
@@ -58,7 +58,7 @@ public:
     abstract void popFront();
 
     @property
-    Association!(E) projection(string[] fields)
+    Relation!(E) projection(string[] fields)
     {
         _builder.projection(fields);
 
@@ -66,7 +66,7 @@ public:
     }
 
     @property
-    Association!(E) reorder()
+    Relation!(E) reorder()
     {
         _builder.reorder;
 
@@ -74,7 +74,7 @@ public:
     }
 
     @property
-    Association!(E) reorder(string field, string direction)
+    Relation!(E) reorder(string field, string direction)
     {
         _builder.reorder(field, direction);
 
@@ -82,7 +82,7 @@ public:
     }
 
     @property
-    Association!(E) where(ExpressionNode node)
+    Relation!(E) where(ExpressionNode node)
     {
         _builder.where(node);
 
@@ -90,7 +90,7 @@ public:
     }
 
     @property
-    Association!(E) where(string field, Nullable!Variant value)
+    Relation!(E) where(string field, Nullable!Variant value)
     {
         _builder.where(field, value);
 
@@ -98,7 +98,7 @@ public:
     }
 
     @property
-    Association!(E) where(T)(string field, T value)
+    Relation!(E) where(T)(string field, T value)
     {
         return this.where(field, value.toNullableVariant);
     }
