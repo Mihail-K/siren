@@ -101,16 +101,20 @@ class Logger
 
     static void log(int l, TList...)(Level!(l) level, TList args)
     {
-        // Write coloured log-level prefix.
-        Logger.put(Log.toColouredString(level));
-        Logger.put(" ");
-
-        foreach(argument; args)
+        // Filterable log levels.
+        static if(isLogLevelActive!(l))
         {
-            Logger.put(argument);
-        }
+            // Write coloured log-level prefix.
+            Logger.put(Log.toColouredString(level));
+            Logger.put(" ");
 
-        writeln;
+            foreach(argument; args)
+            {
+                Logger.put(argument);
+            }
+
+            writeln;
+        }
     }
 
     static void trace(TList...)(TList args)
@@ -141,4 +145,26 @@ class Logger
     {
         Logger.log(Log.Critical, args);
     }
+}
+
+mixin template dump(string expr)
+{
+    // Check that trace level logs are enabled.
+    static if(isLogLevelActive!(Log.Trace.level))
+    {
+        private int _dump()
+        {
+            mixin("auto result = " ~ expr ~";");
+            Logger.trace(expr, " = ", result);
+
+            return 1;
+        }
+
+        private int __dump = _dump;
+    }
+}
+
+template isLogLevelActive(int l)
+{
+    enum isLogLevelActive = true; // TODO
 }
