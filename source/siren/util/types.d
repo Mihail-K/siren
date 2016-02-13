@@ -3,6 +3,7 @@ module siren.util.types;
 
 import std.traits;
 import std.typecons;
+import std.variant;
 
 template isNullAssignable(T)
 {
@@ -19,6 +20,33 @@ template isNullableWrapped(T)
     {
         enum isNullableWrapped = false;
     }
+}
+
+@property
+Nullable!Variant toNullableVariant(T)(T value)
+{
+    Nullable!Variant nv;
+
+    static if(isNullAssignable!(T))
+    {
+        if(value !is null)
+        {
+            nv = Variant(value);
+        }
+    }
+    else static if(isNullableWrapped!(T))
+    {
+        if(!value.isNull)
+        {
+            nv = Variant(value.get);
+        }
+    }
+    else
+    {
+        nv = Variant(value);
+    }
+
+    return nv;
 }
 
 template UnwrapNullable(T)
