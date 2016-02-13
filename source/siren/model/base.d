@@ -43,9 +43,13 @@ public:
 
     static bool create(E entity)
     {
-        // TODO : Run callbacks.
+        // Fire before entity-validation callbacks.
+        fire!(CallbackEvent.BeforeValidation)(entity);
+
         // TODO : Run validations.
-        // TODO : Run callbacks.
+
+        // Fire after entity-validation callbacks.
+        fire!(CallbackEvent.AfterValidation)(entity);
 
         InsertResult result;
         auto query = table.insert
@@ -172,9 +176,13 @@ public:
 
     static bool update(E entity)
     {
-        // TODO : Run callbacks.
+        // Fire before entity-validation callbacks.
+        fire!(CallbackEvent.BeforeValidation)(entity);
+
         // TODO : Run validations.
-        // TODO : Run callbacks.
+
+        // Fire after entity-validation callbacks.
+        fire!(CallbackEvent.AfterValidation)(entity);
 
         auto columns = getNonIDColumnNames!E;
         auto values = get(entity, columns);
