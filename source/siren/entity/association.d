@@ -26,6 +26,12 @@ public:
     }
 
     @property
+    abstract bool empty();
+
+    @property
+    abstract E front();
+
+    @property
     Association!(E) limit(ulong limit)
     {
         _builder.limit(limit);
@@ -48,6 +54,8 @@ public:
 
         return this;
     }
+
+    abstract void popFront();
 
     @property
     Association!(E) projection(string[] fields)

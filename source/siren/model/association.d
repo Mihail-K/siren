@@ -15,6 +15,8 @@ private:
     Adapter _adapter;
     string _context;
 
+    QueryResult _result;
+
 public:
     this(SelectBuilder builder, Adapter adapter, string context = null)
     {
@@ -25,14 +27,23 @@ public:
     }
 
     @property
-    override E take()
+    override bool empty()
     {
-        auto result = _adapter.select(builder, _context);
+        return _result is null || _result.empty;
+    }
 
-        if(!result.empty)
+    @property
+    override E front()
+    {
+        if(_result is null)
         {
+            _result = _adapter.select(builder, _context);
+        }
+
+        if(!_result.empty)
+        {
+            auto row = _result.front;
             auto entity = new E;
-            auto row = result.front;
 
             // Hydrate entity.
             set(entity, row.columns, row.toArray);
@@ -42,5 +53,20 @@ public:
         {
             return null;
         }
+    }
+
+    override void popFront()
+    {
+        if(_result !is null)
+        {
+            _result.popFront;
+        }
+    }
+
+    @property
+    override E take()
+    {
+        auto entity = this.front;
+        return popFront, entity;
     }
 }
