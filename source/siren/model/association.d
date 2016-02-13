@@ -29,7 +29,12 @@ public:
     @property
     override bool empty()
     {
-        return _result is null || _result.empty;
+        if(_result is null)
+        {
+            _result = _adapter.select(builder, _context);
+        }
+
+        return _result.empty;
     }
 
     @property

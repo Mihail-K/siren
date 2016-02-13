@@ -48,7 +48,7 @@ public:
     }
 
     @property
-    Association!(E) order(string field, string direction)
+    Association!(E) order(string field, string direction = "asc")
     {
         _builder.order(field, direction);
 
