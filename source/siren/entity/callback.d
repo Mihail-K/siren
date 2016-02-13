@@ -87,6 +87,8 @@ CallbackEvent toCallbackEvent(string str)
     assert(0, "No event type `" ~ str ~ "`.");
 }
 
+alias Do = Callback;
+
 struct Callback
 {
 private:

@@ -105,6 +105,9 @@ public:
         auto row = result.front;
         set(entity, row.columns, row.toArray);
 
+        // Fire after entity-load callbacks.
+        fire!(CallbackEvent.AfterLoad)(entity);
+
         return entity;
     }
 
