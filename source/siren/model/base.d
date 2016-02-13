@@ -119,6 +119,12 @@ public:
         return entity;
     }
 
+    static E find(E entity)
+    {
+        auto id = getID(entity);
+        return find(id.get.get!(IDType!E));
+    }
+
     static if(isNullableWrapped!(IDType!E))
     {
         static E find(UnwrapNullable!(IDType!E) id)
