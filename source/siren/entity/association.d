@@ -2,6 +2,7 @@
 module siren.entity.association;
 
 import siren.entity.base;
+import siren.sirl;
 import siren.util.types;
 
 import std.typecons;
@@ -9,26 +10,79 @@ import std.variant;
 
 abstract class Association(E : Entity)
 {
-    @property
-    abstract Association!(E) limit(ulong limit);
+private:
+    SelectBuilder _builder;
+
+public:
+    this(SelectBuilder builder)
+    {
+        _builder = builder;
+    }
 
     @property
-    abstract Association!(E) offset(ulong offset);
+    protected SelectBuilder builder()
+    {
+        return _builder;
+    }
 
     @property
-    abstract Association!(E) order(string field, string direction);
+    Association!(E) limit(ulong limit)
+    {
+        _builder.limit(limit);
+
+        return this;
+    }
 
     @property
-    abstract Association!(E) projection(string[] fields);
+    Association!(E) offset(ulong offset)
+    {
+        _builder.offset(offset);
+
+        return this;
+    }
 
     @property
-    abstract Association!(E) reorder(string field, string direction);
+    Association!(E) order(string field, string direction)
+    {
+        _builder.order(field, direction);
+
+        return this;
+    }
+
+    @property
+    Association!(E) projection(string[] fields)
+    {
+        _builder.projection(fields);
+
+        return this;
+    }
+
+    @property
+    Association!(E) reorder(string field, string direction)
+    {
+        _builder.reorder(field, direction);
+
+        return this;
+    }
 
     @property
     abstract E take();
 
     @property
-    abstract Association!(E) where(string field, Nullable!Variant value);
+    Association!(E) where(ExpressionNode node)
+    {
+        _builder.where(node);
+
+        return this;
+    }
+
+    @property
+    Association!(E) where(string field, Nullable!Variant value)
+    {
+        _builder.where(field, value);
+
+        return this;
+    }
 
     @property
     Association!(E) where(T)(string field, T value)

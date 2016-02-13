@@ -45,7 +45,7 @@ public:
     @property
     static auto association()
     {
-        return new ModelAssociation!(typeof(this))(adapter, table.select);
+        return new ModelAssociation!(typeof(this))(table.select, adapter, tableName);
     }
 
     static bool create(E entity)
@@ -150,6 +150,11 @@ public:
         return get!(E, getIDColumnField!E)(entity);
     }
 
+    static auto opIndex(string column)
+    {
+        return table[column];
+    }
+
     static bool save(E entity)
     {
         auto id = getID(entity);
@@ -231,5 +236,12 @@ public:
 
         // Ensure changes were made.
         return result != 0;
+    }
+
+    @property
+    static auto where(TList...)(TList args)
+    if(__traits(compiles, { association.where(args); }))
+    {
+        return association.where(args);
     }
 }

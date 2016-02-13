@@ -13,59 +13,21 @@ class ModelAssociation(M : Model!E, E : Entity) : Association!(E)
 {
 private:
     Adapter _adapter;
-    SelectBuilder _query;
+    string _context;
 
 public:
-    this(Adapter adapter, SelectBuilder query)
+    this(SelectBuilder builder, Adapter adapter, string context = null)
     {
+        super(builder);
+
         _adapter = adapter;
-        _query = query;
-    }
-
-    @property
-    override ModelAssociation!(M, E) limit(ulong limit)
-    {
-        _query.limit(limit);
-
-        return this;
-    }
-
-    @property
-    override ModelAssociation!(M, E) offset(ulong offset)
-    {
-        _query.offset(offset);
-
-        return this;
-    }
-
-    @property
-    override ModelAssociation!(M, E) order(string field, string direction)
-    {
-        _query.order(field, direction);
-
-        return this;
-    }
-
-    @property
-    override ModelAssociation!(M, E) projection(string[] fields)
-    {
-        _query.projection(fields);
-
-        return this;
-    }
-
-    @property
-    override ModelAssociation!(M, E) reorder(string field, string direction)
-    {
-        _query.reorder(field, direction);
-
-        return this;
+        _context = context;
     }
 
     @property
     override E take()
     {
-        auto result = _adapter.select(_query);
+        auto result = _adapter.select(builder, _context);
 
         if(!result.empty)
         {
@@ -81,15 +43,4 @@ public:
             return null;
         }
     }
-
-    @property
-    override ModelAssociation!(M, E) where(string field, Nullable!Variant value)
-    {
-        _query.where(field, value);
-
-        return this;
-    }
-
-    // Local where shadows parent.
-    alias where = Association!(E).where;
 }
