@@ -22,30 +22,9 @@ abstract class Entity
 
 Nullable!Variant get(E : Entity, string field)(E entity)
 {
-    Nullable!Variant value;
-
     auto member = __traits(getMember, entity, field);
 
-    static if(isNullAssignable!(typeof(member)))
-    {
-        if(member !is null)
-        {
-            value = Variant(member);
-        }
-    }
-    else static if(isNullableWrapped!(typeof(member)))
-    {
-        if(!member.isNull)
-        {
-            value = Variant(member.get);
-        }
-    }
-    else
-    {
-        value = Variant(member);
-    }
-
-    return value;
+    return member.toNullableVariant;
 }
 
 Nullable!Variant get(E : Entity)(E entity, string field)
@@ -138,24 +117,7 @@ void set(E : Entity, TList...)(E entity, string[] fields, TList args)
 
     foreach(index, argument; args)
     {
-        static if(isNullAssignable!(typeof(argument)))
-        {
-            if(argument !is null)
-            {
-                values[index] = Variant(argument);
-            }
-        }
-        else static if(isNullableWrapped!(typeof(argument)))
-        {
-            if(!argument.isNull)
-            {
-                values[index] = Variant(argument.get);
-            }
-        }
-        else
-        {
-            values[index] = Variant(argument);
-        }
+        values[index] = argument.toNullableVariant;
     }
 
     set(entity, fields, values);
