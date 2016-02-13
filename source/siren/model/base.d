@@ -3,6 +3,7 @@ module siren.model.base;
 
 import siren.database;
 import siren.entity;
+import siren.model.association;
 import siren.model.exception;
 import siren.sirl;
 import siren.util;
@@ -39,6 +40,12 @@ public:
         }
 
         return _adapter;
+    }
+
+    @property
+    static auto association()
+    {
+        return new ModelAssociation!(typeof(this))(adapter, table.select);
     }
 
     static bool create(E entity)
