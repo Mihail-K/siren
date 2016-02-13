@@ -66,6 +66,14 @@ public:
     }
 
     @property
+    Association!(E) reorder()
+    {
+        _builder.reorder;
+
+        return this;
+    }
+
+    @property
     Association!(E) reorder(string field, string direction)
     {
         _builder.reorder(field, direction);
