@@ -68,7 +68,7 @@ public:
 
             // Set the entity ID from the query result.
             Nullable!Variant id = Variant(result.lastInsertID.get);
-            hydrate(entity, getIDColumnField!E, id);
+            hydrate(entity, [ getIDColumnField!E ], [ id ]);
 
             // Fire after entity-create callbacks.
             fire!(CallbackEvent.AfterCreate)(entity);
@@ -148,6 +148,11 @@ public:
     static auto opIndex(string column)
     {
         return table[column];
+    }
+
+    static auto order(TList...)(TList args)
+    {
+        return relation.order(args);
     }
 
     @property
