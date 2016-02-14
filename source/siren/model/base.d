@@ -117,7 +117,7 @@ public:
 
         auto entity = new E;
         auto row = result.front;
-        hydrate(entity, row.columns, row.toArray);
+        hydrate(entity, toFields(entity, row.columns), row.toArray);
 
         // Fire after entity-load callbacks.
         fire!(CallbackEvent.AfterLoad)(entity);
@@ -174,6 +174,11 @@ public:
         {
             return update(entity);
         }
+    }
+
+    static auto select(string[] fields...)
+    {
+        return relation.projection(fields);
     }
 
     @property

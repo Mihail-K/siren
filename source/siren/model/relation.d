@@ -53,7 +53,7 @@ public:
             auto entity = new E;
 
             // Hydrate entity.
-            hydrate(entity, row.columns, row.toArray);
+            hydrate(entity, toFields(entity, row.columns), row.toArray);
             return entity;
         }
         else

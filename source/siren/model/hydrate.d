@@ -20,7 +20,9 @@ void hydrate(E : Entity)(E entity, string[] fields, Nullable!Variant[] values)
         {
             // TODO : Get a mapping id.
             enum mapping = Model!E.tableName ~ "_id";
-            auto relation = Model!(RelatedType!(E, field)).where(mapping, id);
+            auto relation = Model!(RelatedType!(E, field))
+                .select(getColumnNames!(RelatedType!(E, field)))
+                .where(mapping, id);
 
             __traits(getMember, entity, field) = RelationType!(E, field)(relation);
         }
