@@ -4,8 +4,8 @@ module siren.entity.column;
 import siren.entity.attributes;
 import siren.entity.base;
 import siren.entity.id;
-import siren.entity.relation;
 import siren.entity.transient;
+import siren.util;
 
 import std.algorithm;
 import std.array;
@@ -102,11 +102,32 @@ template isColumn(E : Entity, string field)
 {
     static if(isAccessibleField!(E, field))
     {
-        enum isColumn = !isTransient!(E, field) && !isRelation!(E, field);
+        alias Type = typeof(__traits(getMember, E, field));
+
+        enum isColumn = !isTransient!(E, field) && isAllowedColumnType!Type;
     }
     else
     {
         enum isColumn = false;
+    }
+}
+
+template isAllowedColumnType(Type)
+{
+    static if(isNullableWrapped!Type)
+    {
+        enum isAllowedColumnType =
+            !isNullableWrapped!(UnwrapNullable!Type) &&
+            isAllowedColumnType!(UnwrapNullable!Type);
+    }
+    else
+    {
+        enum isAllowedColumnType =
+            isBoolean!Type ||
+            isNumeric!Type ||
+            isSomeChar!Type ||
+            isSomeString!Type ||
+            is(Type == ubyte[]);
     }
 }
 
