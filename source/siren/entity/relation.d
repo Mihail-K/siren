@@ -3,6 +3,7 @@ module siren.entity.relation;
 
 import siren.entity.attributes;
 import siren.entity.base;
+import siren.entity.has_many;
 import siren.entity.has_one;
 import siren.entity.owned_by;
 import siren.sirl;
@@ -45,6 +46,9 @@ public:
     }
 
     @property
+    abstract bool loaded();
+
+    @property
     Relation!(E) offset(ulong offset)
     {
         _builder.offset(offset);
@@ -69,6 +73,9 @@ public:
 
         return this;
     }
+
+    @property
+    abstract Relation!(E) reload();
 
     @property
     Relation!(E) reorder()
@@ -120,6 +127,7 @@ template isRelation(E : Entity, string member)
         static if(__traits(compiles, TemplateOf!Type))
         {
             enum isRelation = __traits(isSame, TemplateOf!Type, HasOne) ||
+                              __traits(isSame, TemplateOf!Type, HasMany) ||
                               __traits(isSame, TemplateOf!Type, OwnedBy);
         }
         else

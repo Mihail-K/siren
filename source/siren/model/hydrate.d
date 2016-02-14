@@ -18,7 +18,11 @@ void hydrate(E : Entity)(E entity, string[] fields, Nullable!Variant[] values)
 
         static if(__traits(isSame, Relationship, HasOne))
         {
-            hydrateHasOneRelation!(E, field)(entity);
+            hydrateOwningRelation!(E, field)(entity);
+        }
+        else static if(__traits(isSame, Relationship, HasMany))
+        {
+            hydrateOwningRelation!(E, field)(entity);
         }
         else static if(__traits(isSame, Relationship, OwnedBy))
         {
@@ -27,7 +31,7 @@ void hydrate(E : Entity)(E entity, string[] fields, Nullable!Variant[] values)
     }
 }
 
-void hydrateHasOneRelation(E : Entity, string field)(E entity)
+void hydrateOwningRelation(E : Entity, string field)(E entity)
 {
     alias Owned = RelatedType!(E, field);
 

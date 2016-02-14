@@ -62,11 +62,25 @@ public:
         }
     }
 
+    @property
+    override bool loaded()
+    {
+        return _result !is null;
+    }
+
     override void popFront()
     {
         if(_result !is null)
         {
             _result.popFront;
         }
+    }
+
+    @property
+    override ModelRelation!(M, E) reload()
+    {
+        _result = null;
+
+        return this;
     }
 }

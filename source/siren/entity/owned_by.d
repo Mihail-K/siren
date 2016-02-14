@@ -9,7 +9,6 @@ import std.range;
 struct OwnedBy(E : Entity)
 {
 private:
-    bool _loaded;
     Relation!E _relation;
     E _value;
 
@@ -24,17 +23,14 @@ public:
     @property
     bool loaded()
     {
-        return _loaded;
+        return _relation.loaded;
     }
 
     @property
     E reload()
     {
-        // Limit the relation to one result.
-        auto result = _relation.limit(1).take(1);
-
-        _value = !result.empty ? result.front : null;
-        _loaded = true;
+        _relation.limit(1).reload;
+        _value = _relation.front;
 
         return _value;
     }
