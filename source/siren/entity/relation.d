@@ -4,6 +4,7 @@ module siren.entity.relation;
 import siren.entity.attributes;
 import siren.entity.base;
 import siren.entity.has_one;
+import siren.entity.owned_by;
 import siren.sirl;
 import siren.util.types;
 
@@ -118,7 +119,8 @@ template isRelation(E : Entity, string member)
 
         static if(__traits(compiles, TemplateOf!Type))
         {
-            enum isRelation = __traits(isSame, TemplateOf!Type, HasOne);
+            enum isRelation = __traits(isSame, TemplateOf!Type, HasOne) ||
+                              __traits(isSame, TemplateOf!Type, OwnedBy);
         }
         else
         {
@@ -129,6 +131,12 @@ template isRelation(E : Entity, string member)
     {
         enum isRelation = false;
     }
+}
+
+template RelationshipType(E : Entity, string member)
+if(isRelation!(E, member))
+{
+    alias RelationshipType = TemplateOf!(RelationType!(E, member));
 }
 
 template RelationType(E : Entity, string member)

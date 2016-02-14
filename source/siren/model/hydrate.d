@@ -12,19 +12,68 @@ void hydrate(E : Entity)(E entity, string[] fields, Nullable!Variant[] values)
 {
     set(entity, fields, values);
 
-    auto id = Model!E.getID(entity);
-
-    if(!id.isNull && id.get.get!(IDType!E) != IDType!E.init)
+    foreach(field; getRelations!E)
     {
-        foreach(field; getRelations!E)
-        {
-            // TODO : Get a mapping id.
-            enum mapping = Model!E.tableName ~ "_id";
-            auto relation = Model!(RelatedType!(E, field))
-                .select(getColumnNames!(RelatedType!(E, field)))
-                .where(mapping, id);
+        alias Relationship = RelationshipType!(E, field);
 
-            __traits(getMember, entity, field) = RelationType!(E, field)(relation);
+        static if(__traits(isSame, Relationship, HasOne))
+        {
+            hydrateHasOneRelation!(E, field)(entity);
+        }
+        else static if(__traits(isSame, Relationship, OwnedBy))
+        {
+            hydrateOwnedByRelation!(E, field)(entity);
         }
     }
+}
+
+void hydrateHasOneRelation(E : Entity, string field)(E entity)
+{
+    alias Owned = RelatedType!(E, field);
+
+    static if(hasMapping!(E, field))
+    {
+        // Mapping is defined by attribute.
+        enum mapping = getMappingColumn!(E, field);
+    }
+    else
+    {
+        // Mapping is defined by ID column name.
+        enum mapping = getDefaultMappingColumn!E;
+    }
+
+    // Ensure the mapping column is present on the owned entity.
+    static assert(hasColumn!(Owned, mapping), "Entity `" ~ Owned.stringof ~ "` doesn't have column `" ~ mapping ~ "`.");
+
+    auto relation = Model!Owned
+        .select(getColumnNames!Owned)
+        .where(mapping, Model!E.getID(entity));
+
+    __traits(getMember, entity, field) = RelationType!(E, field)(relation);
+}
+
+void hydrateOwnedByRelation(E : Entity, string field)(E entity)
+{
+    alias Owner = RelatedType!(E, field);
+
+    static if(hasMapping!(E, field))
+    {
+        // Mapping is defined by attribute.
+        enum mapping = getMappingColumn!(E, field);
+    }
+    else
+    {
+        // Mapping is defined by owner's ID column name.
+        enum mapping = getDefaultMappingColumn!Owner;
+    }
+
+    // Ensure the mapping column is present on the entity.
+    static assert(hasColumn!(E, mapping), "Entity `" ~ E.stringof ~ "` doesn't have column `" ~ mapping ~ "`.");
+    auto mapped = __traits(getMember, entity, getColumnField!(E, mapping));
+
+    auto relation = Model!Owner
+        .select(getColumnNames!Owner)
+        .where(getIDColumnName!Owner, mapped);
+
+    __traits(getMember, entity, field) = RelationType!(E, field)(relation);
 }
