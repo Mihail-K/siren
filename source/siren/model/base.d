@@ -4,6 +4,7 @@ module siren.model.base;
 import siren.database;
 import siren.entity;
 import siren.model.exception;
+import siren.model.hydrate;
 import siren.model.relation;
 import siren.sirl;
 import siren.util;
@@ -13,7 +14,7 @@ import std.exception;
 import std.typecons;
 import std.variant;
 
-class Model(E : Entity)
+final class Model(E : Entity)
 {
 private:
     static Adapter _adapter;
@@ -67,7 +68,7 @@ public:
 
             // Set the entity ID from the query result.
             Nullable!Variant id = Variant(result.lastInsertID.get);
-            set!(E, getIDColumnField!E)(entity, id);
+            hydrate(entity, getIDColumnField!E, id);
 
             // Fire after entity-create callbacks.
             fire!(CallbackEvent.AfterCreate)(entity);
@@ -116,7 +117,7 @@ public:
 
         auto entity = new E;
         auto row = result.front;
-        set(entity, row.columns, row.toArray);
+        hydrate(entity, row.columns, row.toArray);
 
         // Fire after entity-load callbacks.
         fire!(CallbackEvent.AfterLoad)(entity);

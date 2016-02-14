@@ -4,6 +4,7 @@ module siren.entity.column;
 import siren.entity.attributes;
 import siren.entity.base;
 import siren.entity.id;
+import siren.entity.relation;
 import siren.entity.transient;
 
 import std.algorithm;
@@ -101,7 +102,7 @@ template isColumn(E : Entity, string field)
 {
     static if(isAccessibleField!(E, field))
     {
-        enum isColumn = !isTransient!(E, field);
+        enum isColumn = !isTransient!(E, field) && !isRelation!(E, field);
     }
     else
     {

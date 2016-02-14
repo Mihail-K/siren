@@ -4,6 +4,7 @@ module siren.model.relation;
 import siren.database;
 import siren.entity;
 import siren.model.base;
+import siren.model.hydrate;
 import siren.sirl;
 
 import std.range;
@@ -52,7 +53,7 @@ public:
             auto entity = new E;
 
             // Hydrate entity.
-            set(entity, row.columns, row.toArray);
+            hydrate(entity, row.columns, row.toArray);
             return entity;
         }
         else

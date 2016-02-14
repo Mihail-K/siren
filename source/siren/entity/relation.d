@@ -1,10 +1,14 @@
 
 module siren.entity.relation;
 
+import siren.entity.attributes;
 import siren.entity.base;
+import siren.entity.has_one;
 import siren.sirl;
 import siren.util.types;
 
+import std.meta;
+import std.traits;
 import std.typecons;
 import std.variant;
 
@@ -102,4 +106,49 @@ public:
     {
         return this.where(field, value.toNullableVariant);
     }
+}
+
+/+ - Compile-Time Helpers - +/
+
+template isRelation(E : Entity, string member)
+{
+    static if(isAccessibleField!(E, member))
+    {
+        alias Type = typeof(__traits(getMember, E, member));
+
+        static if(__traits(compiles, TemplateOf!Type))
+        {
+            enum isRelation = __traits(isSame, TemplateOf!Type, HasOne);
+        }
+        else
+        {
+            enum isRelation = false;
+        }
+    }
+    else
+    {
+        enum isRelation = false;
+    }
+}
+
+template RelationType(E : Entity, string member)
+if(isRelation!(E, member))
+{
+    alias RelationType = typeof(__traits(getMember, E, member));
+}
+
+template RelatedType(E : Entity, string member)
+if(isRelation!(E, member))
+{
+    alias RelatedType = TemplateArgsOf!(RelationType!(E, member))[0];
+}
+
+template getRelations(E : Entity)
+{
+    template _isRelation(string member)
+    {
+        enum _isRelation = isRelation!(E, member);
+    }
+
+    alias getRelations = Filter!(_isRelation, FieldNameTuple!E);
 }
