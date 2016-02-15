@@ -55,6 +55,7 @@ public:
     mixin SetFunctions; // set(fields, values)
 
     mixin Callbacks;
+    mixin Relations;
 
     /++
      + Alias for the schema definition that defines this entity.
@@ -105,7 +106,8 @@ public:
             auto row = result.front;
 
             auto entity = new typeof(this);
-            entity.set(row.toAssocArray);
+            auto fields = row.columns.map!toCamelCase.array;
+            entity.hydrate(fields, row.toArray);
 
             // Fire an event if the entity supports them.
             static if(__traits(hasMember, entity, "raise"))

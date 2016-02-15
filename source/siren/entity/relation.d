@@ -1,41 +1,65 @@
 
 module siren.entity.relation;
 
-import siren.entity.attributes;
-import siren.entity.base;
+import siren.database;
 import siren.entity.has_many;
 import siren.entity.has_one;
 import siren.entity.owned_by;
 import siren.sirl;
-import siren.util.types;
+import siren.util;
 
-import std.meta;
-import std.traits;
+import std.algorithm;
+import std.array;
 import std.typecons;
 import std.variant;
 
-abstract class Relation(E)
+class Relation(E)
 {
 private:
     SelectBuilder _builder;
+    QueryResult _result;
 
 public:
-    this(SelectBuilder builder)
+    this()
     {
-        _builder = builder;
+        _builder = E.query.select;
     }
 
     @property
-    protected SelectBuilder builder()
+    bool empty()
     {
-        return _builder;
+        if(_result is null)
+        {
+            _result = E.adapter.select(_builder, E.stringof);
+        }
+
+        return _result.empty;
     }
 
     @property
-    abstract bool empty();
+    E front()
+    {
+        if(_result is null)
+        {
+            _result = E.adapter.select(_builder, E.stringof);
+        }
 
-    @property
-    abstract E front();
+        if(!_result.empty)
+        {
+            auto row = _result.front;
+            auto entity = new E;
+
+            // Hydrate entity.
+            auto fields = row.columns.map!toCamelCase.array;
+            entity.hydrate(fields, row.toArray);
+
+            return entity;
+        }
+        else
+        {
+            return null;
+        }
+    }
 
     @property
     Relation!(E) limit(ulong limit)
@@ -46,7 +70,10 @@ public:
     }
 
     @property
-    abstract bool loaded();
+    bool loaded()
+    {
+        return _result !is null;
+    }
 
     @property
     Relation!(E) offset(ulong offset)
@@ -64,7 +91,13 @@ public:
         return this;
     }
 
-    abstract void popFront();
+    void popFront()
+    {
+        if(_result !is null)
+        {
+            _result.popFront;
+        }
+    }
 
     @property
     Relation!(E) projection(string[] fields)
@@ -75,7 +108,12 @@ public:
     }
 
     @property
-    abstract Relation!(E) reload();
+    Relation!(E) reload()
+    {
+        _result = null;
+
+        return this;
+    }
 
     @property
     Relation!(E) reorder()
@@ -116,10 +154,16 @@ public:
     }
 }
 
-mixin template HydarateFunctions()
+mixin template Relations()
 {
     import std.meta;
     import std.traits;
+
+    @property
+    static auto relation()
+    {
+        return new Relation!(typeof(this));
+    }
 
     void hydrate(string[] names, Nullable!Variant[] values)
     {
@@ -161,7 +205,7 @@ mixin template HydarateFunctions()
         {
             template _isRelation(string member)
             {
-                enum _isRelation = isRelation!(E, member);
+                enum _isRelation = isRelation!(member);
             }
 
             alias getRelations = Filter!(_isRelation, FieldNameTuple!E);
@@ -176,6 +220,23 @@ mixin template HydarateFunctions()
 
             static if(__traits(isSame, Relationship, HasOne))
             {
+                enum foreign = typeof(this).tableDefinition.name ~ "_" ~
+                               primaryColumn!(typeof(this).tableDefinition).name;
+
+                static assert(
+                    __traits(hasMember, Related, foreign.toCamelCase),
+                    "Entity `" ~ Related.stringof ~ "` doesn't have mapping `" ~ foreign.toCamelCase ~ "`."
+                );
+            }
+            else static if(__traits(isSame, Relationship, OwnedBy))
+            {
+                enum foreign = Related.tableDefinition.name ~ "_" ~
+                               primaryColumn!(Related.tableDefinition).name;
+
+                static assert(
+                    __traits(hasMember, typeof(this), foreign.toCamelCase),
+                    "Entity `" ~ typeof(this).stringof ~ "` doesn't have mapping `" ~ foreign.toCamelCase ~ "`."
+                );
             }
         }
     }
