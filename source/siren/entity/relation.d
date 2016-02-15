@@ -6,6 +6,7 @@ import siren.entity.callback;
 import siren.entity.has_many;
 import siren.entity.has_one;
 import siren.entity.owned_by;
+import siren.entity.ranges;
 import siren.schema;
 import siren.sirl;
 import siren.util;
@@ -17,6 +18,8 @@ import std.variant;
 
 class Relation(E)
 {
+    mixin Ranges!E;
+
 private:
     SelectBuilder _builder;
     QueryResult _result;
@@ -36,17 +39,6 @@ public:
     protected SelectBuilder builder()
     {
         return _builder;
-    }
-
-    @property
-    bool empty()
-    {
-        if(_result is null)
-        {
-            this.apply;
-        }
-
-        return _result.empty;
     }
 
     static if(hasPrimary!(E.tableDefinition))
@@ -69,39 +61,9 @@ public:
         }
     }
 
-    @property
-    E front()
-    {
-        if(_result is null)
-        {
-            this.apply;
-        }
-
-        if(!_result.empty)
-        {
-            auto row = _result.front;
-            auto entity = new E;
-
-            // Hydrate entity.
-            auto fields = row.columns.map!toCamelCase.array;
-            entity.hydrate(fields, row.toArray);
-
-            static if(__traits(hasMember, entity, "raise"))
-            {
-                entity.raise(CallbackEvent.AfterLoad);
-            }
-
-            return entity;
-        }
-        else
-        {
-            return null;
-        }
-    }
-
     Relation!(E) limit(ulong limit)
     {
-        _builder.limit(limit);
+        builder.limit(limit);
 
         return this;
     }
@@ -114,29 +76,21 @@ public:
 
     Relation!(E) offset(ulong offset)
     {
-        _builder.offset(offset);
+        builder.offset(offset);
 
         return this;
     }
 
     Relation!(E) order(string field, string direction = "asc")
     {
-        _builder.order(field, direction);
+        builder.order(field, direction);
 
         return this;
     }
 
-    void popFront()
-    {
-        if(_result !is null)
-        {
-            _result.popFront;
-        }
-    }
-
     Relation!(E) projection(string[] fields...)
     {
-        _builder.projection(fields);
+        builder.projection(fields);
 
         return this;
     }
@@ -151,14 +105,14 @@ public:
 
     Relation!(E) reorder()
     {
-        _builder.reorder;
+        builder.reorder;
 
         return this;
     }
 
     Relation!(E) reorder(string field, string direction = "asc")
     {
-        _builder.reorder(field, direction);
+        builder.reorder(field, direction);
 
         return this;
     }
@@ -178,7 +132,7 @@ public:
     {
         foreach(node; nodes)
         {
-            _builder.where(node);
+            builder.where(node);
         }
 
         return this;
@@ -186,7 +140,7 @@ public:
 
     Relation!(E) where(F, V)(F field, V value)
     {
-        _builder.where(field, value);
+        builder.where(field, value);
 
         return this;
     }
