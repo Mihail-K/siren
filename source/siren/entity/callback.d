@@ -117,77 +117,45 @@ public:
     }
 }
 
-/+ - Run-Time Helpers - +/
-
-void fire(CallbackEvent event, E)(E entity)
+mixin template Callbacks()
 {
-    foreach(member; getCallbackFunctionsForEvent!(E, event))
+    import std.meta;
+    import std.traits;
+
+    void raise(CallbackEvent event)
     {
-        static if(arity!(__traits(getMember, E, member)) == 0)
+        template isCallback(string name)
         {
-            __traits(getMember, entity, member)();
+            alias member = Alias!(__traits(getMember, typeof(this), name));
+
+            static if(is(typeof(member) == function))
+            {
+                enum isCallback = getUDAs!(member, Callback).length > 0;
+            }
+            else
+            {
+                enum isCallback = false;
+            }
         }
-        else
+
+        template getCallbackAttributes(string name)
         {
-            __traits(getMember, entity, member)(entity);
+            alias member = Alias!(__traits(getMember, typeof(this), name));
+
+            alias getCallbackAttributes = getUDAs!(member, Callback);
+        }
+
+        enum members = __traits(allMembers, typeof(this));
+        OUTER: foreach(member; Filter!(isCallback, members))
+        {
+            foreach(attribute; getCallbackAttributes!member)
+            {
+                if(attribute.handles(event))
+                {
+                    __traits(getMember, typeof(this), member)();
+                    continue OUTER;
+                }
+            }
         }
     }
-}
-
-/+ - Compile-Time Helpers - +/
-
-template isCallback(E, string member)
-{
-    static if(isAccessibleFunction!(E, member))
-    {
-        enum isCallback = getUDAs!(__traits(getMember, E, member), Callback).length > 0;
-    }
-    else
-    {
-        enum isCallback = false;
-    }
-}
-
-template isCallbackForEvent(E, string member, CallbackEvent event)
-{
-    template _isCallbackForEvent(Callback callback)
-    {
-        enum _isCallbackForEvent = callback.handles(event);
-    }
-
-    enum isCallbackForEvent = Filter!(_isCallbackForEvent, getCallbacks!(E, member)).length > 0;
-}
-
-template getCallbacks(E, string member)
-{
-    static if(isCallback!(E, member))
-    {
-        alias getCallbacks = getUDAs!(__traits(getMember, E, member), Callback);
-    }
-    else
-    {
-        alias getCallbacks = AliasSeq!();
-    }
-}
-
-template getCallbackFunctions(E)
-{
-    template _isCallback(string member)
-    {
-        enum _isCallback = isCallback!(E, member);
-    }
-
-    alias getCallbackFunctions = Filter!(_isCallback, __traits(allMembers, E));
-}
-
-template getCallbackFunctionsForEvent(E, CallbackEvent event)
-{
-    template _isCallbackForEvent(string member)
-    {
-        enum _isCallbackForEvent = isCallbackForEvent!(E, member, event);
-    }
-
-    alias functions = getCallbackFunctions!E;
-
-    alias getCallbackFunctionsForEvent = Filter!(_isCallbackForEvent, functions);
 }

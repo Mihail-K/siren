@@ -1,7 +1,7 @@
 
 module siren.entity.base;
 
-import siren.entity.attributes;
+import siren.entity.callback;
 import siren.schema;
 import siren.util;
 
@@ -54,6 +54,8 @@ public:
     mixin GetFunctions; // get(fields)
     mixin SetFunctions; // set(fields, values)
 
+    mixin Callbacks;
+
     /++
      + Alias for the schema definition that defines this entity.
      ++/
@@ -104,6 +106,12 @@ public:
 
             auto entity = new typeof(this);
             entity.set(row.toAssocArray);
+
+            // Fire an event if the entity supports them.
+            static if(__traits(hasMember, entity, "raise"))
+            {
+                entity.raise(CallbackEvent.AfterLoad);
+            }
 
             return entity;
         }
@@ -183,8 +191,6 @@ mixin template GetFunctions()
 
         OUTER: foreach(index, name; names)
         {
-            import std.conv : text;
-
             foreach(column; tableColumns!tableDefinition)
             {
                 if(name == column.name)
@@ -207,8 +213,6 @@ mixin template SetFunctions()
 
         OUTER: foreach(name, value; names.lockstep(values))
         {
-            import std.conv : text;
-
             foreach(column; tableColumns!tableDefinition)
             {
                 if(name == column.name)
