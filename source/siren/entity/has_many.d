@@ -25,3 +25,26 @@ public:
         return _relation;
     }
 }
+
+class HasManyRelation(Owner, Owned, string mapping) : Relation!(Owned)
+{
+private:
+    Owner _owner;
+
+public:
+    this(Owner owner)
+    {
+        _owner = owner;
+    }
+
+    override void apply()
+    {
+        enum primary = primaryColumn!(Owner.tableDefinition).name;
+
+        builder
+            .projection(tableColumnNames!(Owned.tableDefinition))
+            .where(mapping, __traits(getMember, _owner, primary.toCamelCase));
+
+        super.apply;
+    }
+}

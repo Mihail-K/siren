@@ -295,6 +295,19 @@ mixin template Relations()
                 auto binding = new HasOneRelation!(typeof(this), Related, foreign)(this);
                 __traits(getMember, this, relation) = Type(binding);
             }
+            else static if(__traits(isSame, Relationship, HasMany))
+            {
+                enum foreign = typeof(this).tableDefinition.name ~ "_" ~
+                               primaryColumn!(typeof(this).tableDefinition).name;
+
+                static assert(
+                    __traits(hasMember, Related, foreign.toCamelCase),
+                    "Entity `" ~ Related.stringof ~ "` doesn't have mapping `" ~ foreign.toCamelCase ~ "`."
+                );
+
+                auto binding = new HasManyRelation!(typeof(this), Related, foreign)(this);
+                __traits(getMember, this, relation) = Type(binding);
+            }
             else static if(__traits(isSame, Relationship, OwnedBy))
             {
                 enum foreign = Related.tableDefinition.name ~ "_" ~
