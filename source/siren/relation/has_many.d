@@ -1,10 +1,10 @@
 
-module siren.entity.has_many;
+module siren.relation.has_many;
 
-import siren.entity.base;
-import siren.entity.relation;
-
-import std.range;
+import siren.entity;
+import siren.relation.base;
+import siren.schema;
+import siren.util;
 
 struct HasMany(E)
 {

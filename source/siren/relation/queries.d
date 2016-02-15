@@ -1,5 +1,5 @@
 
-module siren.entity.queries;
+module siren.relation.queries;
 
 import siren.entity.base;
 

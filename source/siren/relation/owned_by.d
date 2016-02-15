@@ -1,12 +1,10 @@
 
-module siren.entity.owned_by;
+module siren.relation.owned_by;
 
-import siren.entity.base;
-import siren.entity.relation;
+import siren.entity;
+import siren.relation.base;
 import siren.schema;
 import siren.util;
-
-import std.range;
 
 struct OwnedBy(Owner)
 {

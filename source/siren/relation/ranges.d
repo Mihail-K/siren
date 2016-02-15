@@ -1,5 +1,5 @@
 
-module siren.entity.ranges;
+module siren.relation.ranges;
 
 import siren.entity.base;
 
@@ -17,25 +17,6 @@ if(isEntity!E)
 
     // Ensure the outer type defines a result property.
     static assert(__traits(hasMember, typeof(this), "result"));
-
-private:
-    ResultRange _range;
-
-    @property
-    ref ResultRange range()
-    {
-        if(_range._result is null)
-        {
-            if(this.result is null)
-            {
-                this.apply;
-            }
-
-            _range = ResultRange(this.result);
-        }
-
-        return _range;
-    }
 
 public:
     struct ResultRange
@@ -99,23 +80,58 @@ public:
     @property
     bool empty()
     {
-        return this.range.empty;
+        if(this.result is null)
+        {
+            this.apply;
+        }
+
+        return this.result.empty;
     }
 
     @property
     E front()
     {
-        return this.range.front;
+        if(!this.empty)
+        {
+            auto row = this.result.front;
+            auto entity = new E;
+
+            // Hydrate entity.
+            auto fields = row.columns.map!toCamelCase.array;
+            entity.hydrate(fields, row.toArray);
+
+            // Raise an event if the entity supports them.
+            static if(__traits(hasMember, entity, "raise"))
+            {
+                entity.raise(CallbackEvent.AfterLoad);
+            }
+
+            return entity;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     void popFront()
     {
-        this.range.popFront;
+        if(this.result is null)
+        {
+            this.apply;
+        }
+
+        this.result.popFront;
     }
 
     @property
     ResultRange save()
     {
-        return this.range.save;
+        if(this.result is null)
+        {
+            this.apply;
+        }
+
+        return ResultRange(this.result);
     }
 }

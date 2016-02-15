@@ -4,8 +4,4 @@ module siren.entity;
 public import siren.entity.attributes;
 public import siren.entity.base;
 public import siren.entity.callback;
-public import siren.entity.has_many;
-public import siren.entity.has_one;
 public import siren.entity.mapped_by;
-public import siren.entity.owned_by;
-public import siren.entity.relation;

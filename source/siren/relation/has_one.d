@@ -1,12 +1,10 @@
 
-module siren.entity.has_one;
+module siren.relation.has_one;
 
-import siren.entity.base;
-import siren.entity.relation;
+import siren.entity;
+import siren.relation.base;
 import siren.schema;
 import siren.util;
-
-import std.range;
 
 struct HasOne(Owned)
 {

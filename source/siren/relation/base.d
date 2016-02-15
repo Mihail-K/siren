@@ -1,13 +1,10 @@
 
-module siren.entity.relation;
+module siren.relation.base;
 
 import siren.database;
-import siren.entity.callback;
-import siren.entity.has_many;
-import siren.entity.has_one;
-import siren.entity.owned_by;
-import siren.entity.queries;
-import siren.entity.ranges;
+import siren.entity;
+import siren.relation.queries;
+import siren.relation.ranges;
 import siren.schema;
 import siren.sirl;
 import siren.util;
