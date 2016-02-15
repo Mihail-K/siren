@@ -116,55 +116,74 @@ public:
     }
 }
 
+mixin template HydarateFunctions()
+{
+    import std.meta;
+    import std.traits;
+
+    void hydrate(string[] names, Nullable!Variant[] values)
+    {
+        template isRelation(string member)
+        {
+            alias Type = typeof(__traits(getMember, typeof(this), member));
+
+            static if(__traits(compiles, TemplateOf!Type))
+            {
+                enum isRelation = __traits(isSame, TemplateOf!Type, HasOne) ||
+                                  __traits(isSame, TemplateOf!Type, HasMany) ||
+                                  __traits(isSame, TemplateOf!Type, OwnedBy);
+            }
+            else
+            {
+                enum isRelation = false;
+            }
+        }
+
+        template RelationshipType(string member)
+        if(isRelation!member)
+        {
+            alias RelationshipType = TemplateOf!(RelationType!member);
+        }
+
+        template RelationType(string member)
+        if(isRelation!member)
+        {
+            alias RelationType = typeof(__traits(getMember, typeof(this), member));
+        }
+
+        template RelatedType(string member)
+        if(isRelation!member)
+        {
+            alias RelatedType = TemplateArgsOf!(RelationType!member)[0];
+        }
+
+        template getRelations(E)
+        {
+            template _isRelation(string member)
+            {
+                enum _isRelation = isRelation!(E, member);
+            }
+
+            alias getRelations = Filter!(_isRelation, FieldNameTuple!E);
+        }
+
+        this.set(names, values);
+
+        foreach(relation; getRelations!(typeof(this)))
+        {
+            alias Related = RelatedType!relation;
+            alias Relationship = RelationshipType!relation;
+
+            static if(__traits(isSame, Relationship, HasOne))
+            {
+            }
+        }
+    }
+
+    void hydrate(Nullable!Variant[string] values)
+    {
+        this.hydrate(values.keys, values.values);
+    }
+}
+
 /+ - Compile-Time Helpers - +/
-
-template isRelation(E, string member)
-{
-    static if(isAccessibleField!(E, member))
-    {
-        alias Type = typeof(__traits(getMember, E, member));
-
-        static if(__traits(compiles, TemplateOf!Type))
-        {
-            enum isRelation = __traits(isSame, TemplateOf!Type, HasOne) ||
-                              __traits(isSame, TemplateOf!Type, HasMany) ||
-                              __traits(isSame, TemplateOf!Type, OwnedBy);
-        }
-        else
-        {
-            enum isRelation = false;
-        }
-    }
-    else
-    {
-        enum isRelation = false;
-    }
-}
-
-template RelationshipType(E, string member)
-if(isRelation!(E, member))
-{
-    alias RelationshipType = TemplateOf!(RelationType!(E, member));
-}
-
-template RelationType(E, string member)
-if(isRelation!(E, member))
-{
-    alias RelationType = typeof(__traits(getMember, E, member));
-}
-
-template RelatedType(E, string member)
-if(isRelation!(E, member))
-{
-    alias RelatedType = TemplateArgsOf!(RelationType!(E, member))[0];
-}
-
-template getRelations(E)
-{
-    template _isRelation(string member)
-    {
-        enum _isRelation = isRelation!(E, member);
-    }
-
-    alias getRelations = Filter!(_isRelation, FieldNameTuple!E);
-}

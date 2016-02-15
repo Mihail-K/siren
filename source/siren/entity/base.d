@@ -119,7 +119,7 @@ public:
         static typeof(this) find(typeof(this) entity)
         {
             enum primary = primaryColumn!tableDefinition.name;
-            auto id = __traits(getMember, entity, primary);
+            auto id = __traits(getMember, entity, primary.toCamelCase);
 
             return typeof(this).find(id);
         }
@@ -146,6 +146,22 @@ public:
 
         return _query;
     }
+
+    /++
+     + Forwards to the Entity's adapter's transaction function.
+     ++/
+    static void transaction(void delegate(Adapter) callback)
+    {
+        adapter.transaction(callback);
+    }
+
+    /++
+     + Ditto.
+     ++/
+    static void transaction(bool nested, void delegate(Adapter) callback)
+    {
+        adapter.transaction(nested, callback);
+    }
 }
 
 /+ - Code Generation - +/
@@ -157,7 +173,7 @@ string fields(TableDefinition table)
     foreach(column; table.columns)
     {
         buffer ~= "%2$s _%1$s;\n".format(
-            column.name,
+            column.name.toCamelCase,
             column.dtype
         );
     }
@@ -175,7 +191,7 @@ string properties(TableDefinition table)
         @property %2$s %1$s() { return this._%1$s; }
         @property %2$s %1$s(%2$s value) { return this._%1$s = value; }
         ".format(
-            column.name,
+            column.name.toCamelCase,
             column.dtype
         );
     }
@@ -193,9 +209,9 @@ mixin template GetFunctions()
         {
             foreach(column; tableColumns!tableDefinition)
             {
-                if(name == column.name)
+                if(name == column.name.toCamelCase)
                 {
-                    mixin("values[index] = this." ~ column.name ~ ".toNullableVariant;");
+                    mixin("values[index] = this." ~ column.name.toCamelCase ~ ".toNullableVariant;");
                     continue OUTER;
                 }
             }
@@ -215,12 +231,12 @@ mixin template SetFunctions()
         {
             foreach(column; tableColumns!tableDefinition)
             {
-                if(name == column.name)
+                if(name == column.name.toCamelCase)
                 {
                     mixin("alias ColumnType = " ~ column.dtype ~ ";");
                     auto result = value.fromNullableVariant!ColumnType;
 
-                    mixin("this." ~ column.name ~ " = result;");
+                    mixin("this." ~ column.name.toCamelCase ~ " = result;");
                     continue OUTER;
                 }
             }
@@ -229,6 +245,6 @@ mixin template SetFunctions()
 
     void set(Nullable!Variant[string] values)
     {
-        set(values.keys, values.values);
+        this.set(values.keys, values.values);
     }
 }
