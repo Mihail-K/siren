@@ -7,12 +7,12 @@ import std.algorithm;
 import std.meta;
 import std.traits;
 
-template isAccessible(E : Entity)
+template isAccessible(E)
 {
     enum isAccessible = __traits(getProtection, E) == "public";
 }
 
-template isAccessible(E : Entity, string member)
+template isAccessible(E, string member)
 {
     static if(isAccessible!E && __traits(hasMember, E, member))
     {
@@ -24,7 +24,7 @@ template isAccessible(E : Entity, string member)
     }
 }
 
-template isAccessibleField(E : Entity, string field)
+template isAccessibleField(E, string field)
 {
     static if(isAccessible!(E, field))
     {
@@ -36,7 +36,7 @@ template isAccessibleField(E : Entity, string field)
     }
 }
 
-template isAccessibleFunction(E : Entity, string name)
+template isAccessibleFunction(E, string name)
 {
     static if(isAccessible!(E, name))
     {
@@ -48,7 +48,7 @@ template isAccessibleFunction(E : Entity, string name)
     }
 }
 
-template getAccessibleFields(E : Entity)
+template getAccessibleFields(E)
 {
     template _isAccessibleField(string field)
     {
@@ -58,7 +58,7 @@ template getAccessibleFields(E : Entity)
     alias getAccessibleFields = Filter!(_isAccessibleField, FieldNameTuple!E);
 }
 
-template getAccessibleFunctions(E : Entity)
+template getAccessibleFunctions(E)
 {
     template _isAccessibleFunction(string name)
     {

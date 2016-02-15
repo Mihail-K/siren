@@ -2,8 +2,8 @@
 module siren.entity.base;
 
 import siren.entity.attributes;
-import siren.entity.column;
-import siren.util.types;
+import siren.schema;
+import siren.util;
 
 import std.array;
 import std.exception;
@@ -13,84 +13,218 @@ import std.string;
 import std.typecons;
 import std.variant;
 
-abstract class Entity
+mixin template Entity(string module_ = "schema")
 {
+private:
+    import std.algorithm;
+    import std.array;
+    import std.meta;
+    import std.string;
+    import std.typecons;
+    import std.variant;
 
-}
+    mixin("import " ~ module_ ~ ";");
 
-/+ - Run-Time Helpers - +/
+    static assert(
+        __traits(hasMember, mixin(module_), "schemaDefinition"),
+        "No Schema Definition in module `" ~ module_ ~ "`."
+    );
 
-Nullable!Variant get(E : Entity, string field)(E entity)
-{
-    auto member = __traits(getMember, entity, field);
+    static assert(
+        is(typeof(schemaDefinition) == SchemaDefinition),
+        "Invalid schema definition."
+    );
 
-    return member.toNullableVariant;
-}
+    static assert(
+        typeof(this).table in schemaDefinition,
+        "No Table `" ~ typeof(this).table ~ "` defined in Schema."
+    );
 
-Nullable!Variant get(E : Entity)(E entity, string field)
-{
-    foreach(accessible; getAccessibleFields!E)
+private:
+    static Adapter _adapter;
+    static Query _query;
+
+    // Define Fields => Columns.
+    mixin(fields(tableDefinition));
+
+public:
+    // Define Properties => Fields.
+    mixin(properties(tableDefinition));
+
+    mixin GetFunctions; // get(fields)
+    mixin SetFunctions; // set(fields, values)
+
+    /++
+     + Alias for the schema definition that defines this entity.
+     ++/
+    alias schemaDefinition = Alias!(__traits(getMember, mixin(module_), "schemaDefinition"));
+
+    /++
+     + The default table name for this entity.
+     ++/
+    enum table = typeof(this).stringof.toLower;
+
+    /++
+     + Alias for the table definition that defines this entity.
+     ++/
+    alias tableDefinition = Alias!(schemaDefinition.opIndex(typeof(this).table));
+
+public:
+    @property
+    static Adapter adapter()
     {
-        if(accessible == field)
+        if(_adapter is null)
         {
-            return get!(E, accessible)(entity);
+            // Use lazy initialization.
+            // TODO : Select adapter based on Entity.
+            _adapter = AdapterProvider.get;
+        }
+
+        if(!_adapter.connected)
+        {
+            // Connect to DB.
+            _adapter.connect;
+        }
+
+        return _adapter;
+    }
+
+    static if(hasPrimary!tableDefinition)
+    {
+        static typeof(this) find(PrimaryType!tableDefinition id)
+        {
+            auto q = query.select
+                .projection(tableColumnNames!tableDefinition)
+                .where(primaryColumn!(tableDefinition).name, id)
+                .limit(1);
+
+            // Try to fetch the entity from the database.
+            auto result = adapter.select(q, typeof(this).stringof);
+            auto row = result.front;
+
+            auto entity = new typeof(this);
+            entity.set(row.toAssocArray);
+
+            return entity;
+        }
+
+        static typeof(this) find(typeof(this) entity)
+        {
+            enum primary = primaryColumn!tableDefinition.name;
+            auto id = __traits(getMember, entity, primary);
+
+            return typeof(this).find(id);
+        }
+
+        static if(isNullableWrapped!(PrimaryType!tableDefinition))
+        {
+            static typeof(this) find(UnwrapNullable!(PrimaryType!tableDefinition) id)
+            {
+                PrimaryType!tableDefinition nullable = id;
+
+                return typeof(this).find(nullable);
+            }
         }
     }
 
-    // Never reached.
-    assert(0, "No return.");
+    @property
+    static Query query()
+    {
+        if(_query is null)
+        {
+            // Use lazy initialization.
+            _query = new Query(typeof(this).table);
+        }
+
+        return _query;
+    }
 }
 
-Nullable!Variant[] get(E : Entity)(E entity, string[] fields)
-{
-    auto values = new Nullable!Variant[fields.length];
+/+ - Code Generation - +/
 
-    foreach(index, field; fields)
+string fields(TableDefinition table)
+{
+    auto buffer = appender!string;
+
+    foreach(column; table.columns)
     {
-        values[index] = get(entity, field);
+        buffer ~= "%2$s _%1$s;\n".format(
+            column.name,
+            column.dtype
+        );
     }
 
-    return values;
+    return buffer.data;
 }
 
-void set(E : Entity, string field)(E entity, Nullable!Variant value)
+string properties(TableDefinition table)
 {
-    alias Type = typeof(__traits(getMember, E, field));
-    __traits(getMember, entity, field) = value.fromNullableVariant!Type;
-}
+    auto buffer = appender!string;
 
-void set(E : Entity)(E entity, string field, Nullable!Variant value)
-{
-    foreach(accessible; getAccessibleFields!E)
+    foreach(column; table.columns)
     {
-        if(accessible == field)
+        buffer ~= "
+        @property %2$s %1$s() { return this._%1$s; }
+        @property %2$s %1$s(%2$s value) { return this._%1$s = value; }
+        ".format(
+            column.name,
+            column.dtype
+        );
+    }
+
+    return buffer.data;
+}
+
+mixin template GetFunctions()
+{
+    Nullable!Variant[] get(string[] names)
+    {
+        auto values = new Nullable!Variant[names.length];
+
+        OUTER: foreach(index, name; names)
         {
-            return set!(E, accessible)(entity, value);
+            import std.conv : text;
+
+            foreach(column; tableColumns!tableDefinition)
+            {
+                if(name == column.name)
+                {
+                    mixin("values[index] = this." ~ column.name ~ ".toNullableVariant;");
+                    continue OUTER;
+                }
+            }
+        }
+
+        return values;
+    }
+}
+
+mixin template SetFunctions()
+{
+    void set(string[] names, Nullable!Variant[] values)
+    {
+        import std.range : lockstep;
+
+        OUTER: foreach(name, value; names.lockstep(values))
+        {
+            import std.conv : text;
+
+            foreach(column; tableColumns!tableDefinition)
+            {
+                if(name == column.name)
+                {
+                    mixin("alias ColumnType = " ~ column.dtype ~ ";");
+                    auto result = value.fromNullableVariant!ColumnType;
+
+                    mixin("this." ~ column.name ~ " = result;");
+                    continue OUTER;
+                }
+            }
         }
     }
 
-    // Never reached.
-    assert(0, "No return.");
-}
-
-void set(E : Entity)(E entity, string[] fields, Nullable!Variant[] values)
-{
-    enforce(fields.length == values.length, "Parameter count mismatch.");
-
-    foreach(field, value; fields.lockstep(values))
+    void set(Nullable!Variant[string] values)
     {
-        set(entity, field, value);
+        set(values.keys, values.values);
     }
-}
-
-void set(E : Entity, TList...)(E entity, string[] fields, TList args)
-{
-    auto values = new Nullable!Variant[args.length];
-
-    foreach(index, argument; args)
-    {
-        values[index] = argument.toNullableVariant;
-    }
-
-    set(entity, fields, values);
 }

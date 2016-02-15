@@ -3,8 +3,6 @@ module siren.entity.mapped_by;
 
 import siren.entity.attributes;
 import siren.entity.base;
-import siren.entity.id;
-import siren.entity.table;
 
 import std.traits;
 
@@ -26,7 +24,7 @@ public:
     }
 }
 
-template hasMapping(E : Entity, string field)
+template hasMapping(E, string field)
 {
     static if(isAccessibleField!(E, field))
     {
@@ -38,7 +36,7 @@ template hasMapping(E : Entity, string field)
     }
 }
 
-template getMappingColumn(E : Entity, string field)
+template getMappingColumn(E, string field)
 {
     static if(hasMapping!(E, field))
     {
@@ -50,7 +48,7 @@ template getMappingColumn(E : Entity, string field)
     }
 }
 
-template getDefaultMappingColumn(E : Entity)
+template getDefaultMappingColumn(E)
 {
     enum getDefaultMappingColumn = getTableName!E ~ "_" ~ getIDColumnName!E;
 }

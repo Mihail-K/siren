@@ -6,7 +6,7 @@ import siren.entity.relation;
 
 import std.range;
 
-struct OwnedBy(E : Entity)
+struct OwnedBy(E)
 {
 private:
     Relation!E _relation;

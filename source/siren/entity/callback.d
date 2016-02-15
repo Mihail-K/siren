@@ -119,7 +119,7 @@ public:
 
 /+ - Run-Time Helpers - +/
 
-void fire(CallbackEvent event, E : Entity)(E entity)
+void fire(CallbackEvent event, E)(E entity)
 {
     foreach(member; getCallbackFunctionsForEvent!(E, event))
     {
@@ -136,7 +136,7 @@ void fire(CallbackEvent event, E : Entity)(E entity)
 
 /+ - Compile-Time Helpers - +/
 
-template isCallback(E : Entity, string member)
+template isCallback(E, string member)
 {
     static if(isAccessibleFunction!(E, member))
     {
@@ -148,7 +148,7 @@ template isCallback(E : Entity, string member)
     }
 }
 
-template isCallbackForEvent(E : Entity, string member, CallbackEvent event)
+template isCallbackForEvent(E, string member, CallbackEvent event)
 {
     template _isCallbackForEvent(Callback callback)
     {
@@ -158,7 +158,7 @@ template isCallbackForEvent(E : Entity, string member, CallbackEvent event)
     enum isCallbackForEvent = Filter!(_isCallbackForEvent, getCallbacks!(E, member)).length > 0;
 }
 
-template getCallbacks(E : Entity, string member)
+template getCallbacks(E, string member)
 {
     static if(isCallback!(E, member))
     {
@@ -170,7 +170,7 @@ template getCallbacks(E : Entity, string member)
     }
 }
 
-template getCallbackFunctions(E : Entity)
+template getCallbackFunctions(E)
 {
     template _isCallback(string member)
     {
@@ -180,7 +180,7 @@ template getCallbackFunctions(E : Entity)
     alias getCallbackFunctions = Filter!(_isCallback, __traits(allMembers, E));
 }
 
-template getCallbackFunctionsForEvent(E : Entity, CallbackEvent event)
+template getCallbackFunctionsForEvent(E, CallbackEvent event)
 {
     template _isCallbackForEvent(string member)
     {

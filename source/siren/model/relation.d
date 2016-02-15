@@ -11,7 +11,7 @@ import std.range;
 import std.typecons;
 import std.variant;
 
-class ModelRelation(M : Model!E, E : Entity) : Relation!(E)
+class ModelRelation(M) : Relation!(M)
 {
 private:
     Adapter _adapter;

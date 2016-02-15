@@ -13,7 +13,7 @@ class EntityNotDestroyedException : SirenException
         super("Entity `" ~ entity ~ "` with ID `" ~ id ~ "` not destroyed.");
     }
 
-    static auto create(E : Entity)(E entity)
+    static auto create(E)(E entity)
     {
         auto id = get!(E, getIDColumnField!E)(entity);
 
@@ -28,7 +28,7 @@ class EntityNotFoundException : SirenException
         super("Entity `" ~ entity ~ "` with ID `" ~ id ~ "` not found.");
     }
 
-    static auto create(E : Entity)(IDType!E id)
+    static auto create(E)(IDType!E id)
     {
         return new EntityNotFoundException(E.stringof, id.text);
     }
@@ -41,7 +41,7 @@ class EntityNotUpdatedException : SirenException
         super("Entity `" ~ entity ~ "` with ID `" ~ id ~ "` not updated.");
     }
 
-    static auto create(E : Entity)(E entity)
+    static auto create(E)(E entity)
     {
         auto id = get!(E, getIDColumnField!E)(entity);
 

@@ -14,7 +14,7 @@ import std.traits;
 import std.typecons;
 import std.variant;
 
-abstract class Relation(E : Entity)
+abstract class Relation(E)
 {
 private:
     SelectBuilder _builder;
@@ -118,7 +118,7 @@ public:
 
 /+ - Compile-Time Helpers - +/
 
-template isRelation(E : Entity, string member)
+template isRelation(E, string member)
 {
     static if(isAccessibleField!(E, member))
     {
@@ -141,25 +141,25 @@ template isRelation(E : Entity, string member)
     }
 }
 
-template RelationshipType(E : Entity, string member)
+template RelationshipType(E, string member)
 if(isRelation!(E, member))
 {
     alias RelationshipType = TemplateOf!(RelationType!(E, member));
 }
 
-template RelationType(E : Entity, string member)
+template RelationType(E, string member)
 if(isRelation!(E, member))
 {
     alias RelationType = typeof(__traits(getMember, E, member));
 }
 
-template RelatedType(E : Entity, string member)
+template RelatedType(E, string member)
 if(isRelation!(E, member))
 {
     alias RelatedType = TemplateArgsOf!(RelationType!(E, member))[0];
 }
 
-template getRelations(E : Entity)
+template getRelations(E)
 {
     template _isRelation(string member)
     {

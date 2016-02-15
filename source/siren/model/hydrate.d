@@ -8,7 +8,7 @@ import siren.util;
 import std.typecons;
 import std.variant;
 
-void hydrate(E : Entity)(E entity, string[] fields, Nullable!Variant[] values)
+void hydrate(E)(E entity, string[] fields, Nullable!Variant[] values)
 {
     set(entity, fields, values);
 
@@ -31,7 +31,7 @@ void hydrate(E : Entity)(E entity, string[] fields, Nullable!Variant[] values)
     }
 }
 
-void hydrateOwningRelation(E : Entity, string field)(E entity)
+void hydrateOwningRelation(E, string field)(E entity)
 {
     alias Owned = RelatedType!(E, field);
 
@@ -56,7 +56,7 @@ void hydrateOwningRelation(E : Entity, string field)(E entity)
     __traits(getMember, entity, field) = RelationType!(E, field)(relation);
 }
 
-void hydrateOwnedByRelation(E : Entity, string field)(E entity)
+void hydrateOwnedByRelation(E, string field)(E entity)
 {
     alias Owner = RelatedType!(E, field);
 

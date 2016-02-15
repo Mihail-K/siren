@@ -14,7 +14,7 @@ import std.exception;
 import std.typecons;
 import std.variant;
 
-final class Model(E : Entity)
+final class Model(E)
 {
 private:
     static Adapter _adapter;

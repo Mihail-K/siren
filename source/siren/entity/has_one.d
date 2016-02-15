@@ -6,7 +6,7 @@ import siren.entity.relation;
 
 import std.range;
 
-struct HasOne(E : Entity)
+struct HasOne(E)
 {
 private:
     Relation!E _relation;
