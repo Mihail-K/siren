@@ -92,51 +92,6 @@ public:
         return _adapter;
     }
 
-    static if(hasPrimary!tableDefinition)
-    {
-        static typeof(this) find(PrimaryType!tableDefinition id)
-        {
-            auto q = query.select
-                .projection(tableColumnNames!tableDefinition)
-                .where(primaryColumn!(tableDefinition).name, id)
-                .limit(1);
-
-            // Try to fetch the entity from the database.
-            auto result = adapter.select(q, typeof(this).stringof);
-            auto row = result.front;
-
-            auto entity = new typeof(this);
-            auto fields = row.columns.map!toCamelCase.array;
-            entity.hydrate(fields, row.toArray);
-
-            // Fire an event if the entity supports them.
-            static if(__traits(hasMember, entity, "raise"))
-            {
-                entity.raise(CallbackEvent.AfterLoad);
-            }
-
-            return entity;
-        }
-
-        static typeof(this) find(typeof(this) entity)
-        {
-            enum primary = primaryColumn!tableDefinition.name;
-            auto id = __traits(getMember, entity, primary.toCamelCase);
-
-            return typeof(this).find(id);
-        }
-
-        static if(isNullableWrapped!(PrimaryType!tableDefinition))
-        {
-            static typeof(this) find(UnwrapNullable!(PrimaryType!tableDefinition) id)
-            {
-                PrimaryType!tableDefinition nullable = id;
-
-                return typeof(this).find(nullable);
-            }
-        }
-    }
-
     @property
     static Query query()
     {
@@ -164,6 +119,14 @@ public:
     {
         adapter.transaction(nested, callback);
     }
+}
+
+template isEntity(E)
+{
+    enum isEntity =
+        is(typeof(__traits(getMember, E, "schemaDefinition")) == SchemaDefinition) &&
+        is(typeof(__traits(getMember, E, "tableDefinition")) == TableDefinition) &&
+        is(typeof(__traits(getMember, E, "table")) : string);
 }
 
 /+ - Code Generation - +/

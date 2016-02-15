@@ -2,9 +2,11 @@
 module siren.entity.relation;
 
 import siren.database;
+import siren.entity.callback;
 import siren.entity.has_many;
 import siren.entity.has_one;
 import siren.entity.owned_by;
+import siren.schema;
 import siren.sirl;
 import siren.util;
 
@@ -36,6 +38,26 @@ public:
         return _result.empty;
     }
 
+    static if(hasPrimary!(E.tableDefinition))
+    {
+        E find(PrimaryType!(E.tableDefinition) id)
+        {
+            return this
+                .projection(tableColumnNames!(E.tableDefinition))
+                .where(primaryColumn!(E.tableDefinition).name, id)
+                .limit(1)
+                .front;
+        }
+
+        E find(E entity)
+        {
+            enum primary = primaryColumn!(E.tableDefinition).name;
+            auto id = __traits(getMember, entity, primary.toCamelCase);
+
+            return find(id);
+        }
+    }
+
     @property
     E front()
     {
@@ -52,6 +74,11 @@ public:
             // Hydrate entity.
             auto fields = row.columns.map!toCamelCase.array;
             entity.hydrate(fields, row.toArray);
+
+            static if(__traits(hasMember, entity, "raise"))
+            {
+                entity.raise(CallbackEvent.AfterLoad);
+            }
 
             return entity;
         }
@@ -99,8 +126,7 @@ public:
         }
     }
 
-    @property
-    Relation!(E) projection(string[] fields)
+    Relation!(E) projection(string[] fields...)
     {
         _builder.projection(fields);
 
@@ -158,6 +184,29 @@ mixin template Relations()
 {
     import std.meta;
     import std.traits;
+
+    static if(hasPrimary!(typeof(this).tableDefinition))
+    {
+        static typeof(this) find(PrimaryType!(typeof(this).tableDefinition) id)
+        {
+            return typeof(this).relation.find(id);
+        }
+
+        static typeof(this) find(typeof(this) entity)
+        {
+            return typeof(this).relation.find(entity);
+        }
+
+        static if(isNullableWrapped!(PrimaryType!(typeof(this).tableDefinition)))
+        {
+            static typeof(this) find(UnwrapNullable!(PrimaryType!(typeof(this).tableDefinition)) id)
+            {
+                PrimaryType!(typeof(this).tableDefinition) nullable = id;
+
+                return typeof(this).find(nullable);
+            }
+        }
+    }
 
     @property
     static auto relation()

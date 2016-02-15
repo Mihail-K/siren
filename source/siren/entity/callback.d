@@ -126,11 +126,9 @@ mixin template Callbacks()
     {
         template isCallback(string name)
         {
-            alias member = Alias!(__traits(getMember, typeof(this), name));
-
-            static if(is(typeof(member) == function))
+            static if(is(typeof(__traits(getMember, typeof(this), name)) == function))
             {
-                enum isCallback = getUDAs!(member, Callback).length > 0;
+                enum isCallback = getUDAs!(__traits(getMember, typeof(this), name), Callback).length > 0;
             }
             else
             {
