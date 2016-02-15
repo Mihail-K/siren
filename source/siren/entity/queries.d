@@ -8,6 +8,7 @@ if(isEntity!E)
 {
     import siren.sirl;
 
+    // Ensure outer type defines a query property.
     static assert(__traits(hasMember, typeof(this), "query"));
 
 public:

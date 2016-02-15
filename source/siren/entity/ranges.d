@@ -11,54 +11,111 @@ if(isEntity!E)
 
     import std.algorithm;
     import std.array;
-    import std.typecons;
 
+    // Ensure the outer type defines an apply function.
     static assert(__traits(hasMember, typeof(this), "apply"));
+
+    // Ensure the outer type defines a result property.
     static assert(__traits(hasMember, typeof(this), "result"));
 
+private:
+    ResultRange _range;
+
+    @property
+    ref ResultRange range()
+    {
+        if(_range._result is null)
+        {
+            if(this.result is null)
+            {
+                this.apply;
+            }
+
+            _range = ResultRange(this.result);
+        }
+
+        return _range;
+    }
+
 public:
+    struct ResultRange
+    {
+    private:
+        QueryResult _result;
+
+    public:
+        this(QueryResult result)
+        {
+            _result = result;
+        }
+
+        @property
+        bool empty()
+        {
+            return _result.empty;
+        }
+
+        @property
+        E front()
+        {
+            if(!empty)
+            {
+                auto row = _result.front;
+                auto entity = new E;
+
+                // Hydrate entity.
+                auto fields = row.columns.map!toCamelCase.array;
+                entity.hydrate(fields, row.toArray);
+
+                // Raise an event if the entity supports them.
+                static if(__traits(hasMember, entity, "raise"))
+                {
+                    entity.raise(CallbackEvent.AfterLoad);
+                }
+
+                return entity;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        void popFront()
+        {
+            if(_result !is null)
+            {
+                _result.popFront;
+            }
+        }
+
+        @property
+        ResultRange save()
+        {
+            return ResultRange(_result.save);
+        }
+    }
+
     @property
     bool empty()
     {
-        if(result is null)
-        {
-            this.apply;
-        }
-
-        return result.empty;
+        return this.range.empty;
     }
 
     @property
     E front()
     {
-        if(!this.empty)
-        {
-            auto row = result.front;
-            auto entity = new E;
-
-            // Hydrate entity.
-            auto fields = row.columns.map!toCamelCase.array;
-            entity.hydrate(fields, row.toArray);
-
-            // Raise an event if the entity supports them.
-            static if(__traits(hasMember, entity, "raise"))
-            {
-                entity.raise(CallbackEvent.AfterLoad);
-            }
-
-            return entity;
-        }
-        else
-        {
-            return null;
-        }
+        return this.range.front;
     }
 
     void popFront()
     {
-        if(result !is null)
-        {
-            result.popFront;
-        }
+        this.range.popFront;
+    }
+
+    @property
+    ResultRange save()
+    {
+        return this.range.save;
     }
 }
