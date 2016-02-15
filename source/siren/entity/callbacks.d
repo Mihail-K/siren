@@ -1,5 +1,5 @@
 
-module siren.entity.callback;
+module siren.entity.callbacks;
 
 import siren.entity.attributes;
 import siren.entity.base;

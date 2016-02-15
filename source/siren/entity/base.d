@@ -1,21 +1,22 @@
 
 module siren.entity.base;
 
-import siren.entity.callback;
 import siren.schema;
 import siren.util;
 
+import std.algorithm;
 import std.array;
-import std.exception;
 import std.meta;
-import std.range;
 import std.string;
-import std.typecons;
-import std.variant;
 
 mixin template Entity(string module_ = "schema")
 {
-private:
+    import siren.entity.callbacks;
+    import siren.entity.hydrates;
+    import siren.entity.relations;
+    import siren.schema;
+    import siren.util;
+
     import std.algorithm;
     import std.array;
     import std.meta;
@@ -25,6 +26,7 @@ private:
 
     mixin("import " ~ module_ ~ ";");
 
+private:
     static assert(
         __traits(hasMember, mixin(module_), "schemaDefinition"),
         "No Schema Definition in module `" ~ module_ ~ "`."
@@ -51,10 +53,8 @@ public:
     // Define Properties => Fields.
     mixin(properties(tableDefinition));
 
-    mixin GetFunctions; // get(fields)
-    mixin SetFunctions; // set(fields, values)
-
     mixin Callbacks;
+    mixin Hydrates;
     mixin Relations;
 
     /++
@@ -90,6 +90,22 @@ public:
         }
 
         return _adapter;
+    }
+
+    static typeof(this) construct(string[] fields, Nullable!Variant[] values)
+    {
+        auto entity = new typeof(this);
+
+        // Hydrate entity.
+        entity.hydrate(fields, values);
+
+        // Raise an event if the entity supports them.
+        static if(__traits(hasMember, entity, "raise"))
+        {
+            entity.raise(CallbackEvent.AfterLoad);
+        }
+
+        return entity;
     }
 
     @property
@@ -162,54 +178,4 @@ string properties(TableDefinition table)
     }
 
     return buffer.data;
-}
-
-mixin template GetFunctions()
-{
-    Nullable!Variant[] get(string[] names)
-    {
-        auto values = new Nullable!Variant[names.length];
-
-        OUTER: foreach(index, name; names)
-        {
-            foreach(column; tableColumns!tableDefinition)
-            {
-                if(name == column.name.toCamelCase)
-                {
-                    mixin("values[index] = this." ~ column.name.toCamelCase ~ ".toNullableVariant;");
-                    continue OUTER;
-                }
-            }
-        }
-
-        return values;
-    }
-}
-
-mixin template SetFunctions()
-{
-    void set(string[] names, Nullable!Variant[] values)
-    {
-        import std.range : lockstep;
-
-        OUTER: foreach(name, value; names.lockstep(values))
-        {
-            foreach(column; tableColumns!tableDefinition)
-            {
-                if(name == column.name.toCamelCase)
-                {
-                    mixin("alias ColumnType = " ~ column.dtype ~ ";");
-                    auto result = value.fromNullableVariant!ColumnType;
-
-                    mixin("this." ~ column.name.toCamelCase ~ " = result;");
-                    continue OUTER;
-                }
-            }
-        }
-    }
-
-    void set(Nullable!Variant[string] values)
-    {
-        this.set(values.keys, values.values);
-    }
 }

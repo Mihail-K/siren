@@ -7,7 +7,7 @@ mixin template Ranges(E)
 if(isEntity!E)
 {
     import siren.database;
-    import siren.entity.callback;
+    import siren.entity;
 
     import std.algorithm;
     import std.array;
@@ -41,20 +41,9 @@ public:
         {
             if(!empty)
             {
-                auto row = _result.front;
-                auto entity = new E;
-
-                // Hydrate entity.
+                auto row = _result.first;
                 auto fields = row.columns.map!toCamelCase.array;
-                entity.hydrate(fields, row.toArray);
-
-                // Raise an event if the entity supports them.
-                static if(__traits(hasMember, entity, "raise"))
-                {
-                    entity.raise(CallbackEvent.AfterLoad);
-                }
-
-                return entity;
+                return E.construct(fields, row.toArray);
             }
             else
             {
@@ -93,20 +82,9 @@ public:
     {
         if(!this.empty)
         {
-            auto row = this.result.front;
-            auto entity = new E;
-
-            // Hydrate entity.
+            auto row = this.result.first;
             auto fields = row.columns.map!toCamelCase.array;
-            entity.hydrate(fields, row.toArray);
-
-            // Raise an event if the entity supports them.
-            static if(__traits(hasMember, entity, "raise"))
-            {
-                entity.raise(CallbackEvent.AfterLoad);
-            }
-
-            return entity;
+            return E.construct(fields, row.toArray);
         }
         else
         {
