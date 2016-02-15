@@ -24,7 +24,18 @@ private:
 public:
     this()
     {
-        _builder = E.query.select;
+        this.reset;
+    }
+
+    protected void apply()
+    {
+        _result = E.adapter.select(_builder, E.stringof);
+    }
+
+    @property
+    protected SelectBuilder builder()
+    {
+        return _builder;
     }
 
     @property
@@ -32,7 +43,7 @@ public:
     {
         if(_result is null)
         {
-            _result = E.adapter.select(_builder, E.stringof);
+            this.apply;
         }
 
         return _result.empty;
@@ -63,7 +74,7 @@ public:
     {
         if(_result is null)
         {
-            _result = E.adapter.select(_builder, E.stringof);
+            this.apply;
         }
 
         if(!_result.empty)
@@ -88,7 +99,6 @@ public:
         }
     }
 
-    @property
     Relation!(E) limit(ulong limit)
     {
         _builder.limit(limit);
@@ -102,7 +112,6 @@ public:
         return _result !is null;
     }
 
-    @property
     Relation!(E) offset(ulong offset)
     {
         _builder.offset(offset);
@@ -110,7 +119,6 @@ public:
         return this;
     }
 
-    @property
     Relation!(E) order(string field, string direction = "asc")
     {
         _builder.order(field, direction);
@@ -141,7 +149,6 @@ public:
         return this;
     }
 
-    @property
     Relation!(E) reorder()
     {
         _builder.reorder;
@@ -149,34 +156,39 @@ public:
         return this;
     }
 
-    @property
-    Relation!(E) reorder(string field, string direction)
+    Relation!(E) reorder(string field, string direction = "asc")
     {
         _builder.reorder(field, direction);
 
         return this;
     }
 
-    @property
-    Relation!(E) where(ExpressionNode node)
+    void reset()
     {
-        _builder.where(node);
+        _builder = E.query.select;
+    }
+
+    @property
+    protected QueryResult result()
+    {
+        return _result;
+    }
+
+    Relation!(E) where(ExpressionNode[] nodes...)
+    {
+        foreach(node; nodes)
+        {
+            _builder.where(node);
+        }
 
         return this;
     }
 
-    @property
-    Relation!(E) where(string field, Nullable!Variant value)
+    Relation!(E) where(F, V)(F field, V value)
     {
         _builder.where(field, value);
 
         return this;
-    }
-
-    @property
-    Relation!(E) where(T)(string field, T value)
-    {
-        return this.where(field, value.toNullableVariant);
     }
 }
 
@@ -184,6 +196,8 @@ mixin template Relations()
 {
     import std.meta;
     import std.traits;
+
+    static assert(isEntity!(typeof(this)));
 
     static if(hasPrimary!(typeof(this).tableDefinition))
     {
@@ -264,6 +278,7 @@ mixin template Relations()
 
         foreach(relation; getRelations!(typeof(this)))
         {
+            alias Type = RelationType!relation;
             alias Related = RelatedType!relation;
             alias Relationship = RelationshipType!relation;
 
@@ -276,6 +291,9 @@ mixin template Relations()
                     __traits(hasMember, Related, foreign.toCamelCase),
                     "Entity `" ~ Related.stringof ~ "` doesn't have mapping `" ~ foreign.toCamelCase ~ "`."
                 );
+
+                auto binding = new HasOneRelation!(typeof(this), Related, foreign)(this);
+                __traits(getMember, this, relation) = Type(binding);
             }
             else static if(__traits(isSame, Relationship, OwnedBy))
             {
@@ -286,6 +304,9 @@ mixin template Relations()
                     __traits(hasMember, typeof(this), foreign.toCamelCase),
                     "Entity `" ~ typeof(this).stringof ~ "` doesn't have mapping `" ~ foreign.toCamelCase ~ "`."
                 );
+
+                auto binding = new OwnedByRelation!(Related, typeof(this), foreign)(this);
+                __traits(getMember, this, relation) = Type(binding);
             }
         }
     }
@@ -295,5 +316,3 @@ mixin template Relations()
         this.hydrate(values.keys, values.values);
     }
 }
-
-/+ - Compile-Time Helpers - +/

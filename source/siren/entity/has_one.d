@@ -3,19 +3,21 @@ module siren.entity.has_one;
 
 import siren.entity.base;
 import siren.entity.relation;
+import siren.schema;
+import siren.util;
 
 import std.range;
 
-struct HasOne(E)
+struct HasOne(Owned)
 {
 private:
-    Relation!E _relation;
-    E _value;
+    Relation!Owned _relation;
+    Owned _value;
 
 public:
     alias value this;
 
-    this(Relation!E relation)
+    this(Relation!Owned relation)
     {
         _relation = relation;
     }
@@ -27,17 +29,40 @@ public:
     }
 
     @property
-    E reload()
+    Owned reload()
     {
-        _relation.limit(1).reload;
-        _value = _relation.front;
+        _value = _relation.reload.front;
 
         return _value;
     }
 
     @property
-    E value()
+    Owned value()
     {
         return loaded ? _value : reload;
+    }
+}
+
+class HasOneRelation(Owner, Owned, string mapping) : Relation!(Owned)
+{
+private:
+    Owner _owner;
+
+public:
+    this(Owner owner)
+    {
+        _owner = owner;
+    }
+
+    override void apply()
+    {
+        enum primary = primaryColumn!(Owner.tableDefinition).name;
+
+        builder
+            .projection(tableColumnNames!(Owned.tableDefinition))
+            .where(mapping, __traits(getMember, _owner, primary.toCamelCase))
+            .limit(1);
+
+        super.apply;
     }
 }
