@@ -58,8 +58,7 @@ public:
     {
         auto id = __traits(getMember, _owned, mapping.toCamelCase);
 
-        builder
-            .projection(tableColumnNames!(Owner.tableDefinition))
+        this.project(tableColumnNames!(Owner.tableDefinition))
             .where(primaryColumn!(Owner.tableDefinition).name, id)
             .limit(1);
 

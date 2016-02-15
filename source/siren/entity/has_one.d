@@ -58,8 +58,7 @@ public:
     {
         enum primary = primaryColumn!(Owner.tableDefinition).name;
 
-        builder
-            .projection(tableColumnNames!(Owned.tableDefinition))
+        this.project(tableColumnNames!(Owned.tableDefinition))
             .where(mapping, __traits(getMember, _owner, primary.toCamelCase))
             .limit(1);
 

@@ -6,6 +6,7 @@ import siren.entity.callback;
 import siren.entity.has_many;
 import siren.entity.has_one;
 import siren.entity.owned_by;
+import siren.entity.queries;
 import siren.entity.ranges;
 import siren.schema;
 import siren.sirl;
@@ -18,35 +19,35 @@ import std.variant;
 
 class Relation(E)
 {
+    mixin Queries!E;
     mixin Ranges!E;
 
 private:
-    SelectBuilder _builder;
+    SelectBuilder _query;
     QueryResult _result;
 
 public:
     this()
     {
-        this.reset;
+        this.clear;
     }
 
     protected void apply()
     {
-        _result = E.adapter.select(_builder, E.stringof);
-    }
-
-    @property
-    protected SelectBuilder builder()
-    {
-        return _builder;
+        _result = E.adapter.select(query, E.stringof);
     }
 
     static if(hasPrimary!(E.tableDefinition))
     {
         E find(PrimaryType!(E.tableDefinition) id)
         {
+            scope(success)
+            {
+                this.popFront;
+            }
+
             return this
-                .projection(tableColumnNames!(E.tableDefinition))
+                .project(tableColumnNames!(E.tableDefinition))
                 .where(primaryColumn!(E.tableDefinition).name, id)
                 .limit(1)
                 .front;
@@ -61,38 +62,22 @@ public:
         }
     }
 
-    Relation!(E) limit(ulong limit)
-    {
-        builder.limit(limit);
-
-        return this;
-    }
-
     @property
     bool loaded()
     {
         return _result !is null;
     }
 
-    Relation!(E) offset(ulong offset)
+    @property
+    protected SelectBuilder query()
     {
-        builder.offset(offset);
-
-        return this;
+        return _query;
     }
 
-    Relation!(E) order(string field, string direction = "asc")
+    @property
+    protected SelectBuilder query(SelectBuilder query)
     {
-        builder.order(field, direction);
-
-        return this;
-    }
-
-    Relation!(E) projection(string[] fields...)
-    {
-        builder.projection(fields);
-
-        return this;
+        return _query = query;
     }
 
     @property
@@ -103,46 +88,10 @@ public:
         return this;
     }
 
-    Relation!(E) reorder()
-    {
-        builder.reorder;
-
-        return this;
-    }
-
-    Relation!(E) reorder(string field, string direction = "asc")
-    {
-        builder.reorder(field, direction);
-
-        return this;
-    }
-
-    void reset()
-    {
-        _builder = E.query.select;
-    }
-
     @property
     protected QueryResult result()
     {
         return _result;
-    }
-
-    Relation!(E) where(ExpressionNode[] nodes...)
-    {
-        foreach(node; nodes)
-        {
-            builder.where(node);
-        }
-
-        return this;
-    }
-
-    Relation!(E) where(F, V)(F field, V value)
-    {
-        builder.where(field, value);
-
-        return this;
     }
 }
 
