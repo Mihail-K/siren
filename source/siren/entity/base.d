@@ -15,7 +15,6 @@ mixin template Entity(string module_ = "schema")
     import siren.entity.associations;
     import siren.entity.attributes;
     import siren.entity.callbacks;
-    import siren.entity.hydrates;
     import siren.entity.relations;
     import siren.relation;
     import siren.sirl;
@@ -24,7 +23,6 @@ mixin template Entity(string module_ = "schema")
 
     mixin Associations;
     mixin Callbacks;
-    mixin Hydrates;
     mixin Relations;
 
 private:
