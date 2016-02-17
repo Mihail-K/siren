@@ -1,33 +1,34 @@
 
 module siren.association.has_one;
 
+import siren.association.relation;
 import siren.entity;
 import siren.relation;
 import siren.schema;
 import siren.util;
 
-struct HasOne(Owned)
+struct HasOne(Subject)
 {
 private:
-    Relation!Owned _relation;
-    Owned _value;
+    Relation!Subject _relation;
+    Subject _value;
 
 public:
     alias value this;
 
-    this(Relation!Owned relation)
+    this(Relation!Subject relation)
     {
         _relation = relation;
     }
 
-    static HasOne!Owned create(Owner, Owned, string mapping)(Owner owner)
+    static HasOne!Subject create(Owner, string mapping)(Owner owner)
     {
         static assert(
-            __traits(hasMember, Owned, mapping.toCamelCase),
-            "Entity `" ~ Owned.stringof ~ "` doesn't have mapping `" ~ mapping.toCamelCase ~ "`."
+            __traits(hasMember, Subject, mapping.toCamelCase),
+            "Entity `" ~ Subject.stringof ~ "` doesn't have mapping `" ~ mapping.toCamelCase ~ "`."
         );
 
-        return HasOne!Owned(new HasOneRelation!(Owner, Owned, mapping)(owner));
+        return HasOne!Subject(new HasOneRelation!(Owner, Subject, mapping)(owner));
     }
 
     @property
@@ -37,7 +38,7 @@ public:
     }
 
     @property
-    Owned reload()
+    Subject reload()
     {
         _value = _relation.reload.front;
 
@@ -45,29 +46,27 @@ public:
     }
 
     @property
-    Owned value()
+    Subject value()
     {
         return loaded ? _value : reload;
     }
 }
 
-class HasOneRelation(Owner, Owned, string mapping) : Relation!(Owned)
+class HasOneRelation(TList...) : AssocativeRelation!TList
 {
-private:
-    Owner _owner;
-
 public:
     this(Owner owner)
     {
-        _owner = owner;
+        super(owner);
     }
 
     override void apply()
     {
-        enum primary = primaryColumn!(Owner.tableDefinition).name;
+        enum primary = primaryColumn!(Subject.tableDefinition).name;
+        auto id = __traits(getMember, this.owner, primary.toCamelCase);
 
-        this.project(tableColumnNames!(Owned.tableDefinition))
-            .where(mapping, __traits(getMember, _owner, primary.toCamelCase))
+        this.project(tableColumnNames!(Subject.tableDefinition))
+            .where(mapping, id)
             .limit(1);
 
         super.apply;

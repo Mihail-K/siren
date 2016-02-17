@@ -1,33 +1,34 @@
 
 module siren.association.owned_by;
 
+import siren.association.relation;
 import siren.entity;
 import siren.relation;
 import siren.schema;
 import siren.util;
 
-struct OwnedBy(Owner)
+struct OwnedBy(Subject)
 {
 private:
-    Relation!Owner _relation;
-    Owner _value;
+    Relation!Subject _relation;
+    Subject _value;
 
 public:
     alias value this;
 
-    this(Relation!Owner relation)
+    this(Relation!Subject relation)
     {
         _relation = relation;
     }
 
-    static OwnedBy!Owner create(Owner, Owned, string mapping)(Owned owned)
+    static OwnedBy!Subject create(Owner, string mapping)(Owner owner)
     {
         static assert(
-            __traits(hasMember, Owned, mapping.toCamelCase),
-            "Entity `" ~ Owned.stringof ~ "` doesn't have mapping `" ~ mapping.toCamelCase ~ "`."
+            __traits(hasMember, Owner, mapping.toCamelCase),
+            "Entity `" ~ Owner.stringof ~ "` doesn't have mapping `" ~ mapping.toCamelCase ~ "`."
         );
 
-        return OwnedBy!Owner(new OwnedByRelation!(Owner, Owned, mapping)(owned));
+        return OwnedBy!Subject(new OwnedByRelation!(Owner, Subject, mapping)(owner));
     }
 
     @property
@@ -37,7 +38,7 @@ public:
     }
 
     @property
-    Owner reload()
+    Subject reload()
     {
         _value = _relation.reload.front;
 
@@ -45,29 +46,26 @@ public:
     }
 
     @property
-    Owner value()
+    Subject value()
     {
         return loaded ? _value : reload;
     }
 }
 
-class OwnedByRelation(Owner, Owned, string mapping) : Relation!(Owner)
+class OwnedByRelation(TList...) : AssocativeRelation!TList
 {
-private:
-    Owned _owned;
-
 public:
-    this(Owned owned)
+    this(Owner owner)
     {
-        _owned = owned;
+        super(owner);
     }
 
     override void apply()
     {
-        auto id = __traits(getMember, _owned, mapping.toCamelCase);
+        auto id = __traits(getMember, this.owner, mapping.toCamelCase);
 
-        this.project(tableColumnNames!(Owner.tableDefinition))
-            .where(primaryColumn!(Owner.tableDefinition).name, id)
+        this.project(tableColumnNames!(Subject.tableDefinition))
+            .where(primaryColumn!(Subject.tableDefinition).name, id)
             .limit(1);
 
         super.apply;

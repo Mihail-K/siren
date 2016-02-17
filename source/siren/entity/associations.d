@@ -71,7 +71,7 @@ public:
             enum foreign = typeof(this).tableDefinition.name ~ "_" ~
                            primaryColumn!(typeof(this).tableDefinition).name;
 
-            auto value = Type.create!(typeof(this), Associated, foreign)(this);
+            auto value = Type.create!(typeof(this), foreign)(this);
             __traits(getMember, this, association) = value;
         }
         else static if(__traits(isSame, Association, HasMany))
@@ -79,7 +79,7 @@ public:
             enum foreign = typeof(this).tableDefinition.name ~ "_" ~
                            primaryColumn!(typeof(this).tableDefinition).name;
 
-            auto value = Type.create!(typeof(this), Associated, foreign)(this);
+            auto value = Type.create!(typeof(this), foreign)(this);
             __traits(getMember, this, association) = value;
         }
         else static if(__traits(isSame, Association, OwnedBy))
@@ -87,7 +87,7 @@ public:
             enum foreign = Associated.tableDefinition.name ~ "_" ~
                            primaryColumn!(Associated.tableDefinition).name;
 
-            auto value = Type.create!(Associated, typeof(this), foreign)(this);
+            auto value = Type.create!(typeof(this), foreign)(this);
             __traits(getMember, this, association) = value;
         }
     }

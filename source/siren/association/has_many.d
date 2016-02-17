@@ -6,53 +6,51 @@ import siren.relation;
 import siren.schema;
 import siren.util;
 
-struct HasMany(E)
+struct HasMany(Subject)
 {
 private:
-    Relation!E _relation;
+    Relation!Subject _relation;
 
 public:
     alias value this;
 
-    this(Relation!E relation)
+    this(Relation!Subject relation)
     {
         _relation = relation;
     }
 
-    static HasMany!Owned create(Owner, Owned, string mapping)(Owner owner)
+    static HasMany!Subject create(Owner, string mapping)(Owner owner)
     {
         static assert(
-            __traits(hasMember, Owned, mapping.toCamelCase),
-            "Entity `" ~ Owned.stringof ~ "` doesn't have mapping `" ~ mapping.toCamelCase ~ "`."
+            __traits(hasMember, Subject, mapping.toCamelCase),
+            "Entity `" ~ Subject.stringof ~ "` doesn't have mapping `" ~ mapping.toCamelCase ~ "`."
         );
 
-        return HasMany!Owned(new HasManyRelation!(Owner, Owned, mapping)(owner));
+        return HasMany!Subject(new HasManyRelation!(Owner, Subject, mapping)(owner));
     }
 
     @property
-    Relation!E value()
+    Relation!Subject value()
     {
         return _relation;
     }
 }
 
-class HasManyRelation(Owner, Owned, string mapping) : Relation!(Owned)
+class HasManyRelation(TList...) : AssocativeRelation!TList
 {
-private:
-    Owner _owner;
-
 public:
     this(Owner owner)
     {
-        _owner = owner;
+        super(owner);
     }
 
     override void apply()
     {
-        enum primary = primaryColumn!(Owner.tableDefinition).name;
+        enum primary = primaryColumn!(Subject.tableDefinition).name;
+        auto id = __traits(getMember, this.owner, primary.toCamelCase);
 
-        this.project(tableColumnNames!(Owned.tableDefinition))
-            .where(mapping, __traits(getMember, _owner, primary.toCamelCase));
+        this.project(tableColumnNames!(Subject.tableDefinition))
+            .where(mapping, id);
 
         super.apply;
     }
