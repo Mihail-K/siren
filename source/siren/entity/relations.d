@@ -51,14 +51,9 @@ public:
             enum _isRelation = isRelation!Type;
         }
 
-        template getRelations(E)
-        {
-            alias getRelations = Filter!(_isRelation, FieldNameTuple!E);
-        }
-
         this.set(names, values);
 
-        foreach(relation; getRelations!(typeof(this)))
+        foreach(relation; Filter!(_isRelation, FieldNameTuple!(typeof(this))))
         {
             alias Type = typeof(__traits(getMember, typeof(this), relation));
 
