@@ -69,20 +69,20 @@ public:
     @property
     bool empty()
     {
-        if(this.result is null)
+        if(result is null)
         {
-            this.apply;
+            apply;
         }
 
-        return this.result.empty;
+        return result.empty;
     }
 
     @property
     Subject front()
     {
-        if(!this.empty)
+        if(!empty)
         {
-            auto row = this.result.first;
+            auto row = result.first;
             auto fields = row.columns.map!toCamelCase.array;
             return Subject.construct(fields, row.toArray);
         }
@@ -94,22 +94,20 @@ public:
 
     void popFront()
     {
-        if(this.result is null)
+        if(result !is null)
         {
-            this.apply;
+            result.popFront;
         }
-
-        this.result.popFront;
     }
 
     @property
     ResultRange save()
     {
-        if(this.result is null)
+        if(result is null)
         {
-            this.apply;
+            apply;
         }
 
-        return ResultRange(this.result);
+        return ResultRange(result.save);
     }
 }
