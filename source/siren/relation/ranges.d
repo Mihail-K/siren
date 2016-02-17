@@ -3,8 +3,8 @@ module siren.relation.ranges;
 
 import siren.entity.base;
 
-mixin template Ranges(E)
-if(isEntity!E)
+mixin template Ranges(Subject)
+if(isEntity!Subject)
 {
     import siren.database;
     import siren.entity;
@@ -19,7 +19,7 @@ if(isEntity!E)
     static assert(__traits(hasMember, typeof(this), "result"));
 
 public:
-    struct ResultRange
+    static struct ResultRange
     {
     private:
         QueryResult _result;
@@ -37,13 +37,13 @@ public:
         }
 
         @property
-        E front()
+        Subject front()
         {
             if(!empty)
             {
                 auto row = _result.first;
                 auto fields = row.columns.map!toCamelCase.array;
-                return E.construct(fields, row.toArray);
+                return Subject.construct(fields, row.toArray);
             }
             else
             {
@@ -78,13 +78,13 @@ public:
     }
 
     @property
-    E front()
+    Subject front()
     {
         if(!this.empty)
         {
             auto row = this.result.first;
             auto fields = row.columns.map!toCamelCase.array;
-            return E.construct(fields, row.toArray);
+            return Subject.construct(fields, row.toArray);
         }
         else
         {

@@ -3,8 +3,8 @@ module siren.relation.queries;
 
 import siren.entity.base;
 
-mixin template Queries(E)
-if(isEntity!E)
+mixin template Queries(Subject)
+if(isEntity!Subject)
 {
     import siren.sirl;
 
@@ -14,7 +14,7 @@ if(isEntity!E)
 public:
     void clear()
     {
-        this.query = E.query.select;
+        this.query = Subject.query.select;
     }
 
     typeof(this) distinct()

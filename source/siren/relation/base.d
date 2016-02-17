@@ -15,12 +15,12 @@ import std.traits;
 import std.typecons;
 import std.variant;
 
-class Relation(E)
+class Relation(Subject)
 {
-    mixin Queries!E;
-    mixin Ranges!E;
+    mixin Queries!Subject;
+    mixin Ranges!Subject;
 
-    static assert(isEntity!E);
+    static assert(isEntity!Subject);
 
 private:
     SelectBuilder _query;
@@ -34,12 +34,12 @@ public:
 
     protected void apply()
     {
-        _result = E.adapter.select(query, E.stringof);
+        _result = Subject.adapter.select(query, Subject.stringof);
     }
 
-    static if(hasPrimary!(E.tableDefinition))
+    static if(hasPrimary!(Subject.tableDefinition))
     {
-        E find(PrimaryType!(E.tableDefinition) id)
+        Subject find(PrimaryType!(Subject.tableDefinition) id)
         {
             scope(success)
             {
@@ -47,15 +47,15 @@ public:
             }
 
             return this
-                .project(tableColumnNames!(E.tableDefinition))
-                .where(primaryColumn!(E.tableDefinition).name, id)
+                .project(tableColumnNames!(Subject.tableDefinition))
+                .where(primaryColumn!(Subject.tableDefinition).name, id)
                 .limit(1)
                 .front;
         }
 
-        E find(E entity)
+        Subject find(Subject entity)
         {
-            enum primary = primaryColumn!(E.tableDefinition).name;
+            enum primary = primaryColumn!(Subject.tableDefinition).name;
             auto id = __traits(getMember, entity, primary.toCamelCase);
 
             return find(id);
@@ -81,7 +81,7 @@ public:
     }
 
     @property
-    Relation!(E) reload()
+    Relation!Subject reload()
     {
         _result = null;
 
