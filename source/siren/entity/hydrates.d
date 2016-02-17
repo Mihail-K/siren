@@ -55,4 +55,20 @@ mixin template Hydrates()
     {
         this.set(values.keys, values.values);
     }
+
+    static typeof(this) construct(string[] fields, Nullable!Variant[] values)
+    {
+        auto entity = new typeof(this);
+
+        // Hydrate entity.
+        entity.hydrate(fields, values);
+
+        // Raise an event if the entity supports them.
+        static if(__traits(hasMember, entity, "raise"))
+        {
+            entity.raise(CallbackEvent.AfterLoad);
+        }
+
+        return entity;
+    }
 }

@@ -11,6 +11,7 @@ import siren.util;
 
 import std.algorithm;
 import std.array;
+import std.traits;
 import std.typecons;
 import std.variant;
 
@@ -90,4 +91,34 @@ public:
     {
         return _result;
     }
+}
+
+template isRelation(Type)
+{
+    static if(__traits(compiles, TemplateOf!Type))
+    {
+        import siren.relation.has_many;
+        import siren.relation.has_one;
+        import siren.relation.owned_by;
+
+        enum isRelation = __traits(isSame, TemplateOf!Type, HasOne) ||
+                          __traits(isSame, TemplateOf!Type, HasMany) ||
+                          __traits(isSame, TemplateOf!Type, OwnedBy);
+    }
+    else
+    {
+        enum isRelation = false;
+    }
+}
+
+template RelationType(Type)
+if(isRelation!Type)
+{
+    alias RelationType = TemplateOf!Type;
+}
+
+template RelatedType(Type)
+if(isRelation!Type)
+{
+    alias RelatedType = TemplateArgsOf!Type[0];
 }

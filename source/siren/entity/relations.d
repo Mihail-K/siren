@@ -44,47 +44,15 @@ public:
 
     void hydrate(string[] names, Nullable!Variant[] values)
     {
-        template isRelation(string member)
+        template _isRelation(string member)
         {
             alias Type = typeof(__traits(getMember, typeof(this), member));
 
-            static if(__traits(compiles, TemplateOf!Type))
-            {
-                enum isRelation = __traits(isSame, TemplateOf!Type, HasOne) ||
-                                  __traits(isSame, TemplateOf!Type, HasMany) ||
-                                  __traits(isSame, TemplateOf!Type, OwnedBy);
-            }
-            else
-            {
-                enum isRelation = false;
-            }
-        }
-
-        template RelationshipType(string member)
-        if(isRelation!member)
-        {
-            alias RelationshipType = TemplateOf!(RelationType!member);
-        }
-
-        template RelationType(string member)
-        if(isRelation!member)
-        {
-            alias RelationType = typeof(__traits(getMember, typeof(this), member));
-        }
-
-        template RelatedType(string member)
-        if(isRelation!member)
-        {
-            alias RelatedType = TemplateArgsOf!(RelationType!member)[0];
+            enum _isRelation = isRelation!Type;
         }
 
         template getRelations(E)
         {
-            template _isRelation(string member)
-            {
-                enum _isRelation = isRelation!(member);
-            }
-
             alias getRelations = Filter!(_isRelation, FieldNameTuple!E);
         }
 
@@ -92,9 +60,10 @@ public:
 
         foreach(relation; getRelations!(typeof(this)))
         {
-            alias Type = RelationType!relation;
-            alias Related = RelatedType!relation;
-            alias Relationship = RelationshipType!relation;
+            alias Type = typeof(__traits(getMember, typeof(this), relation));
+
+            alias Related = RelatedType!Type;
+            alias Relationship = RelationType!Type;
 
             static if(__traits(isSame, Relationship, HasOne))
             {
