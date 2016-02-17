@@ -16,16 +16,19 @@ mixin template Entity(string module_ = "schema")
     import siren.entity.attributes;
     import siren.entity.callbacks;
     import siren.entity.hydrates;
+    import siren.entity.relations;
+    import siren.relation;
     import siren.sirl;
 
     mixin Attributes!module_;
+
     mixin Associations;
     mixin Callbacks;
     mixin Hydrates;
+    mixin Relations;
 
 private:
     static Adapter _adapter;
-    static Query _query;
 
 public:
     @property
@@ -45,18 +48,6 @@ public:
         }
 
         return _adapter;
-    }
-
-    @property
-    static Query query()
-    {
-        if(_query is null)
-        {
-            // Use lazy initialization.
-            _query = new Query(typeof(this).table);
-        }
-
-        return _query;
     }
 
     /++

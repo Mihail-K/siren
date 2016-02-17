@@ -1,14 +1,13 @@
 
 module siren.relation.finders;
 
-import siren.entity;
-
 mixin template Finders(Subject)
-if(isEntity!Subject)
 {
     import siren.entity;
     import siren.schema;
     import siren.util;
+
+    static assert(isEntity!Subject);
 
     // Ensure the outer type defines a project function.
     static assert(__traits(hasMember, typeof(this), "project"));
@@ -21,7 +20,10 @@ public:
     {
         Subject find(PrimaryType!(Subject.tableDefinition) id)
         {
-            scope(success) popFront;
+            scope(success)
+            {
+                this.popFront;
+            }
 
             return this
                 .project(tableColumnNames!(Subject.tableDefinition))

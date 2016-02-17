@@ -25,36 +25,23 @@ class Relation(Subject)
     static assert(isEntity!Subject);
 
 private:
-    SelectBuilder _query;
     QueryResult _result;
 
 public:
     this()
     {
-        this.clear;
+        select = Subject.query.select;
     }
 
     protected void apply()
     {
-        _result = Subject.adapter.select(query, Subject.stringof);
+        _result = Subject.adapter.select(select, Subject.stringof);
     }
 
     @property
     bool loaded()
     {
         return _result !is null;
-    }
-
-    @property
-    protected SelectBuilder query()
-    {
-        return _query;
-    }
-
-    @property
-    protected SelectBuilder query(SelectBuilder query)
-    {
-        return _query = query;
     }
 
     @property

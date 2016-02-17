@@ -13,34 +13,6 @@ mixin template Associations()
     static assert(isEntity!(typeof(this)));
 
 public:
-    static if(hasPrimary!(typeof(this).tableDefinition))
-    {
-        static typeof(this) find(PrimaryType!(typeof(this).tableDefinition) id)
-        {
-            return typeof(this).relation.find(id);
-        }
-
-        static typeof(this) find(typeof(this) entity)
-        {
-            return typeof(this).relation.find(entity);
-        }
-
-        static if(isNullableWrapped!(PrimaryType!(typeof(this).tableDefinition)))
-        {
-            static typeof(this) find(UnwrapNullable!(PrimaryType!(typeof(this).tableDefinition)) id)
-            {
-                PrimaryType!(typeof(this).tableDefinition) nullable = id;
-
-                return typeof(this).find(nullable);
-            }
-        }
-    }
-
-    static Relation!(typeof(this)) relation()
-    {
-        return new Relation!(typeof(this));
-    }
-
     protected enum _isAssociation(string member) = isAssociation!(
         typeof(__traits(getMember, typeof(this), member))
     );

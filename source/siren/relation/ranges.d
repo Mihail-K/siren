@@ -4,13 +4,14 @@ module siren.relation.ranges;
 import siren.entity.base;
 
 mixin template Ranges(Subject)
-if(isEntity!Subject)
 {
     import siren.database;
     import siren.entity;
 
     import std.algorithm;
     import std.array;
+
+    static assert(isEntity!Subject);
 
     // Ensure the outer type defines an apply function.
     static assert(__traits(hasMember, typeof(this), "apply"));
