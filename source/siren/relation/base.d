@@ -3,6 +3,7 @@ module siren.relation.base;
 
 import siren.database;
 import siren.entity;
+import siren.relation.finders;
 import siren.relation.queries;
 import siren.relation.ranges;
 import siren.schema;
@@ -17,6 +18,7 @@ import std.variant;
 
 class Relation(Subject)
 {
+    mixin Finders!Subject;
     mixin Queries!Subject;
     mixin Ranges!Subject;
 
@@ -35,31 +37,6 @@ public:
     protected void apply()
     {
         _result = Subject.adapter.select(query, Subject.stringof);
-    }
-
-    static if(hasPrimary!(Subject.tableDefinition))
-    {
-        Subject find(PrimaryType!(Subject.tableDefinition) id)
-        {
-            scope(success)
-            {
-                this.popFront;
-            }
-
-            return this
-                .project(tableColumnNames!(Subject.tableDefinition))
-                .where(primaryColumn!(Subject.tableDefinition).name, id)
-                .limit(1)
-                .front;
-        }
-
-        Subject find(Subject entity)
-        {
-            enum primary = primaryColumn!(Subject.tableDefinition).name;
-            auto id = __traits(getMember, entity, primary.toCamelCase);
-
-            return find(id);
-        }
     }
 
     @property
