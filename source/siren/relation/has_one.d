@@ -20,6 +20,16 @@ public:
         _relation = relation;
     }
 
+    static HasOne!Owned create(Owner, Owned, string mapping)(Owner owner)
+    {
+        static assert(
+            __traits(hasMember, Owned, mapping.toCamelCase),
+            "Entity `" ~ Owned.stringof ~ "` doesn't have mapping `" ~ mapping.toCamelCase ~ "`."
+        );
+
+        return HasOne!Owned(new HasOneRelation!(Owner, Owned, mapping)(owner));
+    }
+
     @property
     bool loaded()
     {

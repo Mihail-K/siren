@@ -19,6 +19,16 @@ public:
         _relation = relation;
     }
 
+    static HasMany!Owned create(Owner, Owned, string mapping)(Owner owner)
+    {
+        static assert(
+            __traits(hasMember, Owned, mapping.toCamelCase),
+            "Entity `" ~ Owned.stringof ~ "` doesn't have mapping `" ~ mapping.toCamelCase ~ "`."
+        );
+
+        return HasMany!Owned(new HasManyRelation!(Owner, Owned, mapping)(owner));
+    }
+
     @property
     Relation!E value()
     {

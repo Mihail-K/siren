@@ -65,39 +65,24 @@ public:
                 enum foreign = typeof(this).tableDefinition.name ~ "_" ~
                                primaryColumn!(typeof(this).tableDefinition).name;
 
-                static assert(
-                    __traits(hasMember, Related, foreign.toCamelCase),
-                    "Entity `" ~ Related.stringof ~ "` doesn't have mapping `" ~ foreign.toCamelCase ~ "`."
-                );
-
-                auto binding = new HasOneRelation!(typeof(this), Related, foreign)(this);
-                __traits(getMember, this, relation) = Type(binding);
+                auto value = Type.create!(typeof(this), Related, foreign)(this);
+                __traits(getMember, this, relation) = value;
             }
             else static if(__traits(isSame, Relationship, HasMany))
             {
                 enum foreign = typeof(this).tableDefinition.name ~ "_" ~
                                primaryColumn!(typeof(this).tableDefinition).name;
 
-                static assert(
-                    __traits(hasMember, Related, foreign.toCamelCase),
-                    "Entity `" ~ Related.stringof ~ "` doesn't have mapping `" ~ foreign.toCamelCase ~ "`."
-                );
-
-                auto binding = new HasManyRelation!(typeof(this), Related, foreign)(this);
-                __traits(getMember, this, relation) = Type(binding);
+                auto value = Type.create!(typeof(this), Related, foreign)(this);
+                __traits(getMember, this, relation) = value;
             }
             else static if(__traits(isSame, Relationship, OwnedBy))
             {
                 enum foreign = Related.tableDefinition.name ~ "_" ~
                                primaryColumn!(Related.tableDefinition).name;
 
-                static assert(
-                    __traits(hasMember, typeof(this), foreign.toCamelCase),
-                    "Entity `" ~ typeof(this).stringof ~ "` doesn't have mapping `" ~ foreign.toCamelCase ~ "`."
-                );
-
-                auto binding = new OwnedByRelation!(Related, typeof(this), foreign)(this);
-                __traits(getMember, this, relation) = Type(binding);
+                auto value = Type.create!(Related, typeof(this), foreign)(this);
+                __traits(getMember, this, relation) = value;
             }
         }
     }
