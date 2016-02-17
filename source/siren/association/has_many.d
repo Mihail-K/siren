@@ -1,8 +1,8 @@
 
-module siren.relation.has_many;
+module siren.association.has_many;
 
 import siren.entity;
-import siren.relation.base;
+import siren.relation;
 import siren.schema;
 import siren.util;
 

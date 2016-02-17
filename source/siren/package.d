@@ -1,6 +1,7 @@
 
 module siren;
 
+public import siren.association;
 public import siren.config;
 public import siren.database;
 public import siren.entity;

@@ -11,9 +11,9 @@ import std.string;
 
 mixin template Entity(string module_ = "schema")
 {
+    import siren.entity.associations;
     import siren.entity.callbacks;
     import siren.entity.hydrates;
-    import siren.entity.relations;
     import siren.schema;
     import siren.util;
 
@@ -53,9 +53,9 @@ public:
     // Define Properties => Fields.
     mixin(properties(tableDefinition));
 
+    mixin Associations;
     mixin Callbacks;
     mixin Hydrates;
-    mixin Relations;
 
     /++
      + Alias for the schema definition that defines this entity.
