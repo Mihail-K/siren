@@ -10,6 +10,7 @@ mixin template Hydrates()
     import std.typecons;
     import std.variant;
 
+public:
     static typeof(this) construct(string[] fields, Nullable!Variant[] values)
     {
         auto entity = new typeof(this);

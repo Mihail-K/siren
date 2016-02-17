@@ -122,6 +122,7 @@ mixin template Callbacks()
     import std.meta;
     import std.traits;
 
+public:
     void raise(CallbackEvent event)
     {
         template isCallback(string name)
