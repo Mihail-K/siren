@@ -11,17 +11,43 @@ mixin template Associations()
     import std.traits;
 
 public:
+    struct MappedBy
+    {
+    private:
+        string _mapping;
+
+    public:
+        @disable
+        this();
+
+        this(string mapping)
+        {
+            _mapping = mapping;
+        }
+
+        @property
+        string mapping()
+        {
+            return _mapping;
+        }
+    }
+
     alias associations = Filter!(hasAssociation, FieldNameTuple!(typeof(this)));
 
     template mappedBy(string association)
     if(hasAssociation!association)
     {
-        alias Type = typeof(__traits(getMember, typeof(this), association));
+        alias member = Alias!(__traits(getMember, typeof(this), association));
+        alias Type = typeof(member);
 
         alias Associated = AssociatedType!Type;
         alias Association = AssociationType!Type;
 
-        static if(__traits(isSame, Association, OwnedBy))
+        static if(getUDAs!(member, MappedBy).length > 0)
+        {
+            enum mappedBy = getUDAs!(member, MappedBy)[$ - 1].mapping;
+        }
+        else static if(__traits(isSame, Association, OwnedBy))
         {
             enum mappedBy = Associated.table ~ "_" ~ Associated.primaryColumnName;
         }
