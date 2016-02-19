@@ -8,17 +8,7 @@ mixin template Queries(Subject)
 
     static assert(isEntity!Subject);
 
-private:
-    SelectBuilder _select;
-
 public:
-    typeof(this) clear()
-    {
-        select = Subject.query.select;
-
-        return this;
-    }
-
     typeof(this) distinct()
     {
         return this; // TODO
@@ -41,70 +31,58 @@ public:
 
     typeof(this) limit(ulong limit)
     {
-        select.limit(limit);
+        query.limit(limit);
 
         return this;
     }
 
     typeof(this) offset(ulong offset)
     {
-        select.offset(offset);
+        query.offset(offset);
 
         return this;
     }
 
     typeof(this) order(string field, string direction = "asc")
     {
-        select.order(field, direction);
+        query.order(field, direction);
 
         return this;
     }
 
     typeof(this) project()
     {
-        select.projection("*");
+        query.projection("*");
 
         return this;
     }
 
     typeof(this) project(string[] fields...)
     {
-        select.projection(fields);
+        query.projection(fields);
 
         return this;
     }
 
     typeof(this) reorder()
     {
-        select.reorder;
+        query.reorder;
 
         return this;
     }
 
     typeof(this) reorder(string field, string direction = "asc")
     {
-        select.reorder(field, direction);
+        query.reorder(field, direction);
 
         return this;
-    }
-
-    @property
-    protected SelectBuilder select()
-    {
-        return _select;
-    }
-
-    @property
-    protected SelectBuilder select(SelectBuilder select)
-    {
-        return _select = select;
     }
 
     typeof(this) where(ExpressionNode[] nodes...)
     {
         foreach(node; nodes)
         {
-            select.where(node);
+            query.where(node);
         }
 
         return this;
@@ -112,7 +90,7 @@ public:
 
     typeof(this) where(F, V)(F field, V value)
     {
-        select.where(field, value);
+        query.where(field, value);
 
         return this;
     }

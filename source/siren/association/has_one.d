@@ -23,10 +23,7 @@ public:
 
     static HasOne!Subject create(Owner, string mapping)(Owner owner)
     {
-        static assert(
-            __traits(hasMember, Subject, mapping.toCamelCase),
-            "Entity `" ~ Subject.stringof ~ "` doesn't have mapping `" ~ mapping.toCamelCase ~ "`."
-        );
+        static assert(__traits(hasMember, Subject, mapping.toCamelCase));
 
         return HasOne!Subject(new HasOneRelation!(Owner, Subject, mapping)(owner));
     }
@@ -60,8 +57,10 @@ public:
         super(owner);
     }
 
-    override void apply()
+    override Relation!Subject reset()
     {
+        super.reset;
+
         enum primary = primaryColumn!(Subject.tableDefinition).name;
         auto id = __traits(getMember, this.owner, primary.toCamelCase);
 
@@ -69,6 +68,6 @@ public:
             .where(mapping, id)
             .limit(1);
 
-        super.apply;
+        return this;
     }
 }

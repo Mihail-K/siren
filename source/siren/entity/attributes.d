@@ -62,30 +62,40 @@ private:
 
 public:
     /++
+     + Constructs and hydrates the Entity.
+     ++/
+    this(string[] fields, Nullable!Variant[] values)
+    {
+        this.hydrate(fields, values);
+
+        // Raise an event if the entity supports them.
+        static if(__traits(hasMember, this, "raise"))
+        {
+            this.raise(CallbackEvent.AfterLoad);
+        }
+    }
+
+    /++
+     + Ditto, but takes an associative array.
+     ++/
+    this(Nullable!Variant[string] fields)
+    {
+        this(fields.keys, fields.values);
+    }
+
+    /++
+     + Ditto, but takes no parameters.
+     ++/
+    this()
+    {
+        this(cast(string[]) [], cast(Nullable!Variant[]) []);
+    }
+
+    /++
      + Dynamically introduces read and write properties to fields present in
      + the Entity's table definition.
      ++/
     mixin(properties(typeof(this).tableDefinition));
-
-    /++
-     + Constructs and hydrates a new instance of the Entity, firing an
-     + After-Load event, given the Entity type supports it.
-     ++/
-    static typeof(this) construct(string[] fields, Nullable!Variant[] values)
-    {
-        auto entity = new typeof(this);
-
-        // Hydrate entity.
-        entity.hydrate(fields, values);
-
-        // Raise an event if the entity supports them.
-        static if(__traits(hasMember, entity, "raise"))
-        {
-            entity.raise(CallbackEvent.AfterLoad);
-        }
-
-        return entity;
-    }
 
     /++
      + Hydrates this instance of the Entity using two arrays containing fields

@@ -5,13 +5,14 @@ import siren.database;
 import siren.entity;
 import siren.relation.finders;
 import siren.relation.queries;
-import siren.relation.ranges;
 import siren.schema;
 import siren.sirl;
 import siren.util;
 
 import std.algorithm;
 import std.array;
+import std.range;
+import std.string;
 import std.traits;
 import std.typecons;
 import std.variant;
@@ -20,41 +21,135 @@ class Relation(Subject)
 {
     mixin Finders!Subject;
     mixin Queries!Subject;
-    mixin Ranges!Subject;
 
     static assert(isEntity!Subject);
 
 private:
-    QueryResult _result;
+    SelectBuilder _query;
+    Subject[] _results;
 
 public:
     this()
     {
-        select = Subject.query.select;
+        _query = Subject.query.select;
+        _results = null;
     }
 
-    protected void apply()
+    protected void applyQuery()
     {
-        _result = Subject.adapter.select(select, Subject.stringof);
+        auto result = Subject.adapter.select(_query, Subject.stringof);
+
+        _results = [ ];
+        foreach(row; result)
+        {
+            auto fields = row.columns.map!toCamelCase.array;
+            _results ~= new Subject(fields, row.toArray);
+        }
     }
 
     @property
-    bool loaded()
+    bool empty()
     {
-        return _result !is null;
+        return load, _results.empty;
     }
 
     @property
-    Relation!Subject reload()
+    Subject front()
     {
-        _result = null;
+        return load, _results.front;
+    }
+
+    @property
+    size_t length()
+    {
+        return load, _results.length;
+    }
+
+    @property
+    Relation!Subject load()
+    {
+        if(!loaded)
+        {
+            applyQuery;
+        }
 
         return this;
     }
 
     @property
-    protected QueryResult result()
+    bool loaded()
     {
-        return _result;
+        return _results !is null;
+    }
+
+    size_t opDollar()
+    {
+        return length;
+    }
+
+    Subject opIndex(size_t index)
+    {
+        return load, _results[index];
+    }
+
+    Subject[] opSlice(size_t start, size_t stop)
+    {
+        return load, _results[start .. stop];
+    }
+
+    void popFront()
+    {
+        if(loaded)
+        {
+            _results.popFront;
+        }
+    }
+
+    @property
+    protected SelectBuilder query()
+    {
+        return _query;
+    }
+
+    @property
+    Relation!Subject reload()
+    {
+        return reset, load;
+    }
+
+    @property
+    Relation!Subject reset()
+    {
+        _query = Subject.query.select;
+        _results = null;
+
+        return this;
+    }
+
+    @property
+    Subject[] results()
+    {
+        return load, _results;
+    }
+
+    @property
+    InputRangeObject!(Subject[]) save()
+    {
+        return load, _results.inputRangeObject;
+    }
+
+    @property
+    override string toString()
+    {
+        if(loaded)
+        {
+            return "Relation[%(%s, %)%s]".format(
+                results.take(5), length > 5 ? ", ..." : ""
+            );
+        }
+        else
+        {
+            return "Relation[ - ]";
+        }
     }
 }

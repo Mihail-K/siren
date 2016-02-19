@@ -23,10 +23,7 @@ public:
 
     static OwnedBy!Subject create(Owner, string mapping)(Owner owner)
     {
-        static assert(
-            __traits(hasMember, Owner, mapping.toCamelCase),
-            "Entity `" ~ Owner.stringof ~ "` doesn't have mapping `" ~ mapping.toCamelCase ~ "`."
-        );
+        static assert(__traits(hasMember, Owner, mapping.toCamelCase));
 
         return OwnedBy!Subject(new OwnedByRelation!(Owner, Subject, mapping)(owner));
     }
@@ -60,14 +57,16 @@ public:
         super(owner);
     }
 
-    override void apply()
+    override Relation!Subject reset()
     {
+        super.reset;
+
         auto id = __traits(getMember, this.owner, mapping.toCamelCase);
 
         this.project(tableColumnNames!(Subject.tableDefinition))
             .where(primaryColumn!(Subject.tableDefinition).name, id)
             .limit(1);
 
-        super.apply;
+        return this;
     }
 }
