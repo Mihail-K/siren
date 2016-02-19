@@ -161,7 +161,7 @@ public:
     @property
     ColumnBuilder primary(bool primary)
     {
-        enforce(!_table.hasPrimary, "Table `" ~ _table._name ~ "` already has primary key.");
+        enforce(!_table.hasPrimaryColumn, "Table `" ~ _table._name ~ "` already has primary key.");
 
         return _primary = primary, this;
     }

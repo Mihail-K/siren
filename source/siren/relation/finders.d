@@ -16,9 +16,9 @@ mixin template Finders(Subject)
     static assert(__traits(hasMember, typeof(this), "where"));
 
 public:
-    static if(hasPrimary!(Subject.tableDefinition))
+    static if(Subject.hasPrimary)
     {
-        Subject find(Subject.PrimaryColumnType id)
+        Subject find(Subject.PrimaryKey id)
         {
             scope(success)
             {
@@ -27,29 +27,27 @@ public:
 
             return this
                 .project(Subject.columnNames)
-                .where(Subject.primaryColumnName, id)
+                .where(Subject.primaryKeyName, id)
                 .limit(1)
                 .front;
         }
 
         Subject find(Subject entity)
         {
-            auto id = __traits(getMember, entity, Subject.primaryColumnField);
-
-            return find(id);
+            return find(entity.id);
         }
 
-        static if(isNullableWrapped!(Subject.PrimaryColumnType))
+        static if(isNullableWrapped!(Subject.PrimaryKey))
         {
-            Subject find(UnwrapNullable!(Subject.PrimaryColumnType) id)
+            Subject find(UnwrapNullable!(Subject.PrimaryKey) id)
             {
-                Subject.PrimaryColumnType nullable = id;
+                Subject.PrimaryKey nullable = id;
 
                 return find(nullable);
             }
         }
 
-        Relation!Subject findList(Subject.PrimaryColumnType[] ids...)
+        Relation!Subject findList(Subject.PrimaryKey[] ids...)
         {
             return null; // TODO : WHERE-IN
         }

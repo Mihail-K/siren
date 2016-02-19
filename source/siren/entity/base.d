@@ -15,6 +15,7 @@ mixin template Entity()
     mixin Callbacks;
     mixin Relations;
     mixin Transactions;
+    mixin Persistence;
 
     /++
      + The default name of the module from which the schema is loaded.

@@ -30,32 +30,35 @@ public:
     @property
     enum string table = typeof(this).stringof.toCamelCase;
 
+    @property
+    enum bool hasPrimary = hasPrimaryColumn!(typeof(this).tableDefinition);
+
     // Check if the model defines a primary key.
-    static if(hasPrimary!(typeof(this).tableDefinition))
+    static if(typeof(this).hasPrimary)
     {
         /++
          + The entity's primary key defintion.
          ++/
         @property
-        alias primaryColumnDefinition = Alias!(primaryColumn!(typeof(this).tableDefinition));
+        alias primaryKey = Alias!(primaryColumn!(typeof(this).tableDefinition));
 
         /++
          + The name of the entity's primary column.
          ++/
         @property
-        enum string primaryColumnName = typeof(this).primaryColumnDefinition.name;
+        enum string primaryKeyName = typeof(this).primaryKey.name;
 
         /++
          + The name of the field in the entity that maps to the primary column.
          ++/
         @property
-        enum string primaryColumnField = typeof(this).primaryColumnName.toCamelCase;
+        enum string primaryKeyField = typeof(this).primaryKeyName.toCamelCase;
 
         /++
          + Alias for the type of the primary column.
          ++/
         @property
-        alias PrimaryColumnType = PrimaryType!(typeof(this).tableDefinition);
+        alias PrimaryKey = PrimaryType!(typeof(this).tableDefinition);
     }
 
     /++

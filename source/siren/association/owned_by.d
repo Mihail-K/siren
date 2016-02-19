@@ -59,11 +59,9 @@ public:
 
     override SelectBuilder defaultQuery()
     {
-        auto id = __traits(getMember, this.owner, mapping.toCamelCase);
-
         return super.defaultQuery
             .projection(Subject.columnNames)
-            .where(Subject.primaryColumnName, id)
+            .where(Subject.primaryKeyName, this.owner.id)
             .limit(1);
     }
 }

@@ -10,6 +10,7 @@ import std.string;
 mixin template Attributes()
 {
     import siren.entity;
+    import siren.schema;
 
     static assert(isEntity!(typeof(this)));
 
@@ -26,6 +27,25 @@ public:
      + the Entity's table definition.
      ++/
     mixin(properties(typeof(this).tableDefinition));
+
+    static if(typeof(this).hasPrimary)
+    {
+        // Uniform access to entity primary key.
+        static if(typeof(this).primaryKeyField != "id")
+        {
+            @property
+            typeof(this).PrimaryKey id()
+            {
+                return __traits(getMember, this, typeof(this).primaryKeyField);
+            }
+
+            @property
+            typeof(this).PrimaryKey id(typeof(this).PrimaryKey value)
+            {
+                return __traits(getMember, this, typeof(this).primaryKeyField) = value;
+            }
+        }
+    }
 }
 
 /+ - Code Generation - +/

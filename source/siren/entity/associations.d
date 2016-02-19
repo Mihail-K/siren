@@ -49,12 +49,12 @@ public:
         }
         else static if(__traits(isSame, Association, OwnedBy))
         {
-            enum mappedBy = Associated.table ~ "_" ~ Associated.primaryColumnName;
+            enum mappedBy = Associated.table ~ "_" ~ Associated.primaryKeyName;
         }
         else static if(__traits(isSame, Association, HasOne) ||
                        __traits(isSame, Association, HasMany))
         {
-            enum mappedBy = typeof(this).table ~ "_" ~ typeof(this).primaryColumnName;
+            enum mappedBy = typeof(this).table ~ "_" ~ typeof(this).primaryKeyName;
         }
         else
         {

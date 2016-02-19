@@ -3,6 +3,8 @@ module siren.sirl.insert_builder;
 
 import siren.sirl.node;
 
+import std.algorithm;
+import std.array;
 import std.typecons;
 import std.variant;
 

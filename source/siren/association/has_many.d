@@ -43,10 +43,8 @@ public:
 
     override SelectBuilder defaultQuery()
     {
-        auto id = __traits(getMember, this.owner, Subject.primaryColumnField);
-
         return super.defaultQuery
             .projection(Subject.columnNames)
-            .where(mapping, id);
+            .where(mapping, this.owner.id);
     }
 }

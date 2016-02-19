@@ -63,29 +63,29 @@ template tableColumnNames(TableDefinition table)
     alias tableColumnNames = staticMap!(_getName, tableColumns!table);
 }
 
-template hasPrimary(TableDefinition table)
+template hasPrimaryColumn(TableDefinition table)
 {
-    template _isPrimary(ColumnDefinition column)
+    template _isPrimaryColumn(ColumnDefinition column)
     {
-        enum _isPrimary = column.primary;
+        enum _isPrimaryColumn = column.primary;
     }
 
-    enum hasPrimary = Filter!(_isPrimary, tableColumns!table).length > 0;
+    enum hasPrimaryColumn = Filter!(_isPrimaryColumn, tableColumns!table).length > 0;
 }
 
 template primaryColumn(TableDefinition table)
-if(hasPrimary!table)
+if(hasPrimaryColumn!table)
 {
-    template _isPrimary(ColumnDefinition column)
+    template _isPrimaryColumn(ColumnDefinition column)
     {
-        enum _isPrimary = column.primary;
+        enum _isPrimaryColumn = column.primary;
     }
 
-    enum primaryColumn = Filter!(_isPrimary, tableColumns!table)[0];
+    enum primaryColumn = Filter!(_isPrimaryColumn, tableColumns!table)[0];
 }
 
 template PrimaryType(TableDefinition table)
-if(hasPrimary!table)
+if(hasPrimaryColumn!table)
 {
     mixin("alias PrimaryType = " ~ primaryColumn!table.dtype ~ ";");
 }
@@ -130,7 +130,7 @@ public:
         return _schema;
     }
 
-    package bool hasPrimary()
+    package bool hasPrimaryColumn()
     {
         return _columns.values.any!(c => c._primary);
     }
