@@ -1,29 +1,25 @@
 
 module siren.entity.base;
 
-import siren.schema;
-import siren.util;
-
-import std.algorithm;
-import std.array;
-import std.meta;
-import std.string;
-
-mixin template Entity(string module_ = "schema")
+mixin template Entity()
 {
     import siren.database;
-    import siren.entity.associations;
-    import siren.entity.attributes;
-    import siren.entity.callbacks;
-    import siren.entity.relations;
+    import siren.entity;
     import siren.relation;
     import siren.sirl;
 
-    mixin Attributes!module_;
-
+    mixin Schema;
+    mixin Attributes;
+    mixin Construction;
     mixin Associations;
     mixin Callbacks;
     mixin Relations;
+
+    /++
+     + The default name of the module from which the schema is loaded.
+     ++/
+    @property
+    enum string schemaModule = "schema";
 
 private:
     static Adapter _adapter;
@@ -63,12 +59,4 @@ public:
     {
         adapter.transaction(nested, callback);
     }
-}
-
-template isEntity(E)
-{
-    enum isEntity =
-        is(typeof(__traits(getMember, E, "schemaDefinition")) == SchemaDefinition) &&
-        is(typeof(__traits(getMember, E, "tableDefinition")) == TableDefinition) &&
-        is(typeof(__traits(getMember, E, "table")) : string);
 }

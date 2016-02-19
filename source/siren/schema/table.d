@@ -41,7 +41,10 @@ public:
 
     ColumnDefinition opIndex(string column)
     {
-        return _columns[column];
+        auto ptr = column in _columns;
+        assert(ptr, "No column `" ~ column ~ "` in table `" ~ _name ~ "`.");
+
+        return *ptr;
     }
 }
 

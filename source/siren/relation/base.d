@@ -38,11 +38,11 @@ public:
     protected void applyQuery()
     {
         auto result = Subject.adapter.select(_query, Subject.stringof);
+        auto fields = result.columns.map!toCamelCase.array;
 
         _results = [ ];
         foreach(row; result)
         {
-            auto fields = row.columns.map!toCamelCase.array;
             _results ~= new Subject(fields, row.toArray);
         }
     }

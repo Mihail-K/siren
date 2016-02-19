@@ -7,51 +7,11 @@ import siren.util;
 import std.array;
 import std.string;
 
-mixin template Attributes(string module_ = "schema")
+mixin template Attributes()
 {
-    import siren.schema;
-    import siren.util;
+    import siren.entity;
 
-    mixin("import " ~ module_ ~ ";");
-
-    import std.meta;
-    import std.range;
-    import std.typecons;
-    import std.variant;
-
-    // Ensure that a schema in present in the imported module.
-    static assert(__traits(hasMember, mixin(module_), "schemaDefinition"));
-
-    // Ensure that the imported schema is of the right type.
-    static assert(is(typeof(typeof(this).schemaDefinition) == SchemaDefinition));
-
-    // Entities need a corresponding table in the schema to map fields.
-    static assert(typeof(this).table in typeof(this).schemaDefinition);
-
-public:
-    /++
-     + Alias for the schema definition that defines this entity.
-     ++/
-    alias schemaDefinition = Alias!(__traits(getMember, mixin(module_), "schemaDefinition"));
-
-    /++
-     + The default table name for this entity.
-     ++/
-    enum string table = typeof(this).stringof.toCamelCase;
-
-    // Check if the model defines a primary key.
-    static if(hasPrimary!(typeof(this).tableDefinition))
-    {
-        /++
-         + The name of the Entity's primary key in the database.
-         ++/
-        enum string primaryKey = primaryColumn!(typeof(this).tableDefinition).name;
-    }
-
-    /++
-     + Alias for the table definition that defines this entity.
-     ++/
-    alias tableDefinition = Alias!(typeof(this).schemaDefinition.opIndex(typeof(this).table));
+    static assert(isEntity!(typeof(this)));
 
 private:
     /++
@@ -62,124 +22,10 @@ private:
 
 public:
     /++
-     + Constructs and hydrates the Entity.
-     ++/
-    this(string[] fields, Nullable!Variant[] values)
-    {
-        this.hydrate(fields, values);
-
-        // Raise an event if the entity supports them.
-        static if(__traits(hasMember, this, "raise"))
-        {
-            this.raise(CallbackEvent.AfterLoad);
-        }
-    }
-
-    /++
-     + Ditto, but takes an associative array.
-     ++/
-    this(Nullable!Variant[string] fields)
-    {
-        this(fields.keys, fields.values);
-    }
-
-    /++
-     + Ditto, but takes no parameters.
-     ++/
-    this()
-    {
-        this(cast(string[]) [], cast(Nullable!Variant[]) []);
-    }
-
-    /++
      + Dynamically introduces read and write properties to fields present in
      + the Entity's table definition.
      ++/
     mixin(properties(typeof(this).tableDefinition));
-
-    /++
-     + Hydrates this instance of the Entity using two arrays containing fields
-     + corresponding to values, and preparing any assocations on the Entity,
-     + given the Entity type supports them.
-     ++/
-    typeof(this) hydrate(string[] names, Nullable!Variant[] values)
-    {
-        this.set(names, values);
-
-        // Populate associations if the entity supports them.
-        static if(__traits(hasMember, typeof(this), "prepareAssociations"))
-        {
-            this.prepareAssociations;
-        }
-
-        return this;
-    }
-
-    /++
-     + Ditto, but takes parameters as an associative array.
-     ++/
-    typeof(this) hydrate(Nullable!Variant[string] values)
-    {
-        return this.hydrate(values.keys, values.values);
-    }
-
-    /++
-     + Reads values from the Entity's mapped fields (defined in the Schema).
-     ++/
-    Nullable!Variant[] get(string[] names)
-    {
-        auto values = new Nullable!Variant[names.length];
-
-        OUTER: foreach(index, name; names)
-        {
-            foreach(column; tableColumns!tableDefinition)
-            {
-                enum field = column.name.toCamelCase;
-
-                if(name == field)
-                {
-                    mixin("values[index] = this." ~ field ~ ".toNullableVariant;");
-                    continue OUTER;
-                }
-            }
-        }
-
-        return values;
-    }
-
-    /++
-     + Writes values to the Entity's mapped fields (defined in the Schema).
-     + Values are given by two arrays containing fields corresponding to values.
-     ++/
-    typeof(this) set(string[] names, Nullable!Variant[] values)
-    {
-        OUTER: foreach(name, value; names.lockstep(values))
-        {
-            foreach(column; tableColumns!tableDefinition)
-            {
-                enum field = column.name.toCamelCase;
-
-                if(name == field)
-                {
-                    mixin("alias ColumnType = " ~ column.dtype ~ ";");
-                    auto result = value.fromNullableVariant!ColumnType;
-
-                    mixin("this." ~ field ~ " = result;");
-                    continue OUTER;
-                }
-            }
-        }
-
-        return this;
-    }
-
-    /++
-     + Ditto, but takes parameters as an associative array.
-     ++/
-    typeof(this) set(Nullable!Variant[string] values)
-    {
-        return this.set(values.keys, values.values);
-    }
 }
 
 /+ - Code Generation - +/

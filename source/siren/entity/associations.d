@@ -10,16 +10,12 @@ mixin template Associations()
     import std.meta;
     import std.traits;
 
-    static assert(isEntity!(typeof(this)));
-
 public:
     protected enum _isAssociation(string member) = isAssociation!(
         typeof(__traits(getMember, typeof(this), member))
     );
 
-    alias associations = Filter!(
-        _isAssociation, FieldNameTuple!(typeof(this))
-    );
+    alias associations = Filter!(_isAssociation, FieldNameTuple!(typeof(this)));
 
     void prepareAssociations()
     {

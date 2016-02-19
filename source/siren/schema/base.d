@@ -39,7 +39,10 @@ public:
 
     TableDefinition opIndex(string table)
     {
-        return _tables[table];
+        auto ptr = table in _tables;
+        assert(ptr, "No table `" ~ table ~ "` in schema.");
+
+        return *ptr;
     }
 }
 
