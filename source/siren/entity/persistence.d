@@ -15,6 +15,16 @@ private:
     bool _persisted;
 
 public:
+    static bool create(string[] names, Nullable!Variant[] values)
+    {
+        return new typeof(this)(names, values).create;
+    }
+
+    static bool create(Nullable!Variant[string] values)
+    {
+        return typeof(this).create(values.keys, values.values);
+    }
+
     bool create()
     {
         enum columns = [ typeof(this).columnNames ]
@@ -30,9 +40,12 @@ public:
         // Ensure a transaction is active.
         typeof(this).transaction(false, (adapter)
         {
+            this.registerTransactionCallbacks;
+
             // Raise an BeforeCreate event if the entity supports it.
             static if(__traits(hasMember, typeof(this), "raise"))
             {
+                this.raise(CallbackEvent.BeforeSave);
                 this.raise(CallbackEvent.BeforeCreate);
             }
 
@@ -42,6 +55,7 @@ public:
             static if(__traits(hasMember, typeof(this), "raise"))
             {
                 this.raise(CallbackEvent.AfterCreate);
+                this.raise(CallbackEvent.AfterSave);
             }
         });
 
@@ -98,9 +112,12 @@ public:
         // Ensure a transaction is active.
         typeof(this).transaction(false, (adapter)
         {
+            this.registerTransactionCallbacks;
+
             // Raise an BeforeUpdate event if the entity supports it.
             static if(__traits(hasMember, typeof(this), "raise"))
             {
+                this.raise(CallbackEvent.BeforeSave);
                 this.raise(CallbackEvent.BeforeUpdate);
             }
 
@@ -110,6 +127,7 @@ public:
             static if(__traits(hasMember, typeof(this), "raise"))
             {
                 this.raise(CallbackEvent.AfterUpdate);
+                this.raise(CallbackEvent.AfterSave);
             }
         });
 
