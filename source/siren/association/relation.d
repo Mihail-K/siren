@@ -17,6 +17,8 @@ public:
     this(Owner owner)
     {
         _owner = owner;
+
+        super();
     }
 
     @property

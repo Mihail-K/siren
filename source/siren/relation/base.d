@@ -31,7 +31,7 @@ private:
 public:
     this()
     {
-        _query = Subject.query.select;
+        _query = defaultQuery;
         _results = null;
     }
 
@@ -45,6 +45,11 @@ public:
         {
             _results ~= new Subject(fields, row.toArray);
         }
+    }
+
+    protected SelectBuilder defaultQuery()
+    {
+        return Subject.query.select;
     }
 
     @property
@@ -120,7 +125,7 @@ public:
     @property
     Relation!Subject reset()
     {
-        _query = Subject.query.select;
+        _query = defaultQuery;
         _results = null;
 
         return this;

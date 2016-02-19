@@ -41,16 +41,12 @@ public:
         super(owner);
     }
 
-    override Relation!Subject reset()
+    override SelectBuilder defaultQuery()
     {
-        super.reset;
+        auto id = __traits(getMember, this.owner, Subject.primaryColumnField);
 
-        enum primary = primaryColumn!(Subject.tableDefinition).name;
-        auto id = __traits(getMember, this.owner, primary.toCamelCase);
-
-        this.project(tableColumnNames!(Subject.tableDefinition))
+        return super.defaultQuery
+            .projection(Subject.columnNames)
             .where(mapping, id);
-
-        return this;
     }
 }
