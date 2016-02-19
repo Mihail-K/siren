@@ -11,52 +11,52 @@ mixin template Associations()
     import std.traits;
 
 public:
-    protected enum _isAssociation(string member) = isAssociation!(
-        typeof(__traits(getMember, typeof(this), member))
-    );
+    alias associations = Filter!(hasAssociation, FieldNameTuple!(typeof(this)));
 
-    alias associations = Filter!(_isAssociation, FieldNameTuple!(typeof(this)));
-
-    void prepareAssociations()
+    template mappedBy(string association)
+    if(hasAssociation!association)
     {
-        foreach(association; typeof(this).associations)
-        {
-            this.prepareAssociation!association;
-        }
-    }
-
-    void prepareAssociation(string association)()
-    {
-        static assert(_isAssociation!association);
-
         alias Type = typeof(__traits(getMember, typeof(this), association));
 
         alias Associated = AssociatedType!Type;
         alias Association = AssociationType!Type;
 
-        static if(__traits(isSame, Association, HasOne))
+        static if(__traits(isSame, Association, OwnedBy))
         {
-            enum foreign = typeof(this).tableDefinition.name ~ "_" ~
-                           primaryColumn!(typeof(this).tableDefinition).name;
-
-            auto value = Type.create!(typeof(this), foreign)(this);
-            __traits(getMember, this, association) = value;
+            enum mappedBy = Associated.table ~ "_" ~ Associated.primaryColumnName;
         }
-        else static if(__traits(isSame, Association, HasMany))
+        else static if(__traits(isSame, Association, HasOne) ||
+                       __traits(isSame, Association, HasMany))
         {
-            enum foreign = typeof(this).tableDefinition.name ~ "_" ~
-                           primaryColumn!(typeof(this).tableDefinition).name;
-
-            auto value = Type.create!(typeof(this), foreign)(this);
-            __traits(getMember, this, association) = value;
+            enum mappedBy = typeof(this).table ~ "_" ~ typeof(this).primaryColumnName;
         }
-        else static if(__traits(isSame, Association, OwnedBy))
+        else
         {
-            enum foreign = Associated.tableDefinition.name ~ "_" ~
-                           primaryColumn!(Associated.tableDefinition).name;
-
-            auto value = Type.create!(typeof(this), foreign)(this);
-            __traits(getMember, this, association) = value;
+            static assert(0, "Unsupported association `" ~ Association.stringof ~ "`.");
         }
+    }
+
+    template hasAssociation(string member)
+    {
+        alias Type = typeof(__traits(getMember, typeof(this), member));
+        enum hasAssociation = isAssociation!Type;
+    }
+
+    void loadEntityAssociations()
+    {
+        foreach(association; typeof(this).associations)
+        {
+            this.loadEntityAssociation!association;
+        }
+    }
+
+    void loadEntityAssociation(string association)()
+    if(hasAssociation!association)
+    {
+        alias Type = typeof(__traits(getMember, typeof(this), association));
+        enum mapping = typeof(this).mappedBy!association;
+
+        Type value = Type.create!(typeof(this), mapping)(this);
+        __traits(getMember, this, association) = value;
     }
 }

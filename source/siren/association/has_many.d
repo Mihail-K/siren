@@ -21,7 +21,7 @@ public:
 
     static HasMany!Subject create(Owner, string mapping)(Owner owner)
     {
-        static assert(__traits(hasMember, Subject, mapping.toCamelCase));
+        static assert(Subject.hasColumn!mapping);
 
         return HasMany!Subject(new HasManyRelation!(Owner, Subject, mapping)(owner));
     }

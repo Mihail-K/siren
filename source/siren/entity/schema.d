@@ -69,6 +69,11 @@ public:
     alias columnNames = tableColumnNames!(typeof(this).tableDefinition);
 
     /++
+     + Checks if a column is present in the table definition.
+     ++/
+    enum hasColumn(string column) = column in typeof(this).tableDefinition;
+
+    /++
      + Accessor for the table definition that defines this entity.
      ++/
     @property

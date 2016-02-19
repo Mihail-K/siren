@@ -23,7 +23,7 @@ public:
 
     static OwnedBy!Subject create(Owner, string mapping)(Owner owner)
     {
-        static assert(__traits(hasMember, Owner, mapping.toCamelCase));
+        static assert(Owner.hasColumn!mapping);
 
         return OwnedBy!Subject(new OwnedByRelation!(Owner, Subject, mapping)(owner));
     }

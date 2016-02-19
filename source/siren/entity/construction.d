@@ -51,9 +51,9 @@ public:
         this.set(names, values);
 
         // Populate associations if the entity supports them.
-        static if(__traits(hasMember, typeof(this), "prepareAssociations"))
+        static if(__traits(hasMember, typeof(this), "loadEntityAssociations"))
         {
-            this.prepareAssociations;
+            this.loadEntityAssociations;
         }
 
         return this;
