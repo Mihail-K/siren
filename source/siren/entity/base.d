@@ -14,6 +14,7 @@ mixin template Entity()
     mixin Associations;
     mixin Callbacks;
     mixin Relations;
+    mixin Transactions;
 
     /++
      + The default name of the module from which the schema is loaded.
@@ -42,21 +43,5 @@ public:
         }
 
         return _adapter;
-    }
-
-    /++
-     + Forwards to the Entity's adapter's transaction function.
-     ++/
-    static void transaction(void delegate(Adapter) callback)
-    {
-        adapter.transaction(callback);
-    }
-
-    /++
-     + Ditto.
-     ++/
-    static void transaction(bool nested, void delegate(Adapter) callback)
-    {
-        adapter.transaction(nested, callback);
     }
 }

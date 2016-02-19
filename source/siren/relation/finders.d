@@ -34,7 +34,7 @@ public:
 
         Subject find(Subject entity)
         {
-            auto id = __traits(getMember, entity, Subject.primaryColumnField());
+            auto id = __traits(getMember, entity, Subject.primaryColumnField);
 
             return find(id);
         }
