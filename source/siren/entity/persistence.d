@@ -101,6 +101,18 @@ public:
     {
         this.set(names, values);
 
+        return this.update;
+    }
+
+    bool update(Nullable!Variant[string] values)
+    {
+        this.set(values);
+
+        return this.update;
+    }
+
+    bool update()
+    {
         enum columns = [ typeof(this).columnNames ];
         enum fields = columns.map!toCamelCase.array;
 
@@ -132,15 +144,5 @@ public:
         });
 
         return result != 0;
-    }
-
-    bool update(Nullable!Variant[string] values)
-    {
-        return this.update(values.keys, values.values);
-    }
-
-    bool update()
-    {
-        return this.update(cast(string[]) [], cast(Nullable!Variant[]) []);
     }
 }
