@@ -6,7 +6,6 @@ import siren.entity.base;
 
 import std.algorithm;
 import std.array;
-import std.exception;
 import std.meta;
 import std.traits;
 
@@ -73,20 +72,6 @@ enum CallbackEvent : string
     BeforeUpdate = "before-update"
 }
 
-@property
-CallbackEvent toCallbackEvent(string str)
-{
-    foreach(event; EnumMembers!CallbackEvent)
-    {
-        if(str == cast(string) event)
-        {
-            return event;
-        }
-    }
-
-    assert(0, "No event type `" ~ str ~ "`.");
-}
-
 alias Do = Callback;
 
 struct Callback
@@ -97,7 +82,7 @@ private:
 public:
     this(string[] events...)
     {
-        this(events.map!toCallbackEvent.array);
+        this(events.map!(e => cast(CallbackEvent) e).array);
     }
 
     this(CallbackEvent[] events...)
@@ -151,7 +136,15 @@ public:
             {
                 if(attribute.handles(event))
                 {
-                    __traits(getMember, typeof(this), member)();
+                    static if(arity!(__traits(getMember, this, member)) == 1)
+                    {
+                        __traits(getMember, this, member)(this);
+                    }
+                    else
+                    {
+                        __traits(getMember, this, member)();
+                    }
+
                     continue OUTER;
                 }
             }
