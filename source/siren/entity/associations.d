@@ -10,6 +10,9 @@ mixin template Associations()
     import std.meta;
     import std.traits;
 
+private:
+    enum __AssocationsSupported = true;
+
 public:
     struct MappedBy
     {

@@ -107,6 +107,9 @@ mixin template Callbacks()
     import std.meta;
     import std.traits;
 
+private:
+    enum __CallbacksSupported = true;
+
 public:
     void raise(CallbackEvent event)
     {

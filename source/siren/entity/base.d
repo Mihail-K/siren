@@ -12,6 +12,7 @@ mixin template Entity()
     mixin Attributes;
     mixin Construction;
     mixin Associations;
+    mixin Dirty;
     mixin Callbacks;
     mixin Relations;
     mixin Transactions;

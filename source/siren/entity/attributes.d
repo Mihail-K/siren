@@ -15,11 +15,16 @@ mixin template Attributes()
     static assert(isEntity!(typeof(this)));
 
 private:
-    /++
-     + Dynamically introduces fields corresponding to fields present in the
-     + Entity's table definition.
-     ++/
-    mixin(fields(typeof(this).tableDefinition));
+    static struct FieldStates
+    {
+        /++
+         + Dynamically introduces fields corresponding to fields present in the
+         + Entity's table definition.
+         ++/
+        mixin(fields(__traits(parent, typeof(this)).tableDefinition));
+    }
+
+    FieldStates __fields;
 
 public:
     /++
@@ -72,8 +77,8 @@ string properties(TableDefinition table)
     foreach(column; table.columns)
     {
         buffer ~= "
-        @property %2$s %1$s() { return this._%1$s; }
-        @property %2$s %1$s(%2$s value) { return this._%1$s = value; }
+        @property %2$s %1$s() { return this.__fields._%1$s; }
+        @property %2$s %1$s(%2$s value) { return this.__fields._%1$s = value; }
         ".format(
             column.name.toCamelCase,
             column.dtype

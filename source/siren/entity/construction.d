@@ -16,10 +16,10 @@ public:
      ++/
     this(string[] fields, Nullable!Variant[] values)
     {
-        this.hydrate(fields, values);
+        this.set(fields, values);
 
         // Raise an event if the entity supports them.
-        static if(__traits(hasMember, this, "raise"))
+        static if(is(typeof(typeof(this).__CallbacksSupported)))
         {
             this.raise(CallbackEvent.AfterLoad);
         }
@@ -39,32 +39,6 @@ public:
     this()
     {
         this(cast(string[]) [], cast(Nullable!Variant[]) []);
-    }
-
-    /++
-     + Hydrates this instance of the Entity using two arrays containing fields
-     + corresponding to values, and preparing any assocations on the Entity,
-     + given the Entity type supports them.
-     ++/
-    typeof(this) hydrate(string[] names, Nullable!Variant[] values)
-    {
-        this.set(names, values);
-
-        // Populate associations if the entity supports them.
-        static if(__traits(hasMember, typeof(this), "loadEntityAssociations"))
-        {
-            this.loadEntityAssociations;
-        }
-
-        return this;
-    }
-
-    /++
-     + Ditto, but takes parameters as an associative array.
-     ++/
-    typeof(this) hydrate(Nullable!Variant[string] values)
-    {
-        return this.hydrate(values.keys, values.values);
     }
 
     /++
@@ -112,6 +86,18 @@ public:
                     continue OUTER;
                 }
             }
+        }
+
+        // Update clean states, if they're supported.
+        static if(is(typeof(typeof(this).__DirtySupported)))
+        {
+            this.updateCleanStates;
+        }
+
+        // Populate associations if the entity supports them.
+        static if(is(typeof(typeof(this).__AssocationsSupported)))
+        {
+            this.loadEntityAssociations;
         }
 
         return this;
